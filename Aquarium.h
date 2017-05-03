@@ -13,6 +13,7 @@
 #include <QtWidgets>
 
 #include <MainSelector.h>
+#include <WebView.h>
 
 class Aquarium : public QMainWindow
 {
@@ -21,11 +22,17 @@ public:
     Aquarium();
     virtual ~Aquarium();
 
+public slots:
+	void activateFishDisplay();
+	void activateDataDisplay();
+	void closeFishDisplay();
+
 protected:
     void showEvent(QShowEvent*);
     
 private:
     MainSelector *m_primary;
+    WebView *m_fishview;
 };
 
 #endif /* Aquarium_hpp */

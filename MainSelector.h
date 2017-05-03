@@ -22,6 +22,13 @@ protected slots:
 	void showEvent(QShowEvent*);
 	void paintEvent(QPaintEvent*);
 
+	void fishButtonPressed();
+	void dataButtonPressed();
+
+signals:
+	void activateFishDisplay();
+	void activateDataDisplay();
+
 private:
     QPushButton *m_fish;
     QPushButton *m_data;

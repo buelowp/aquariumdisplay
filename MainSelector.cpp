@@ -30,6 +30,9 @@ void MainSelector::init()
 	m_fishLabel->setAlignment(Qt::AlignCenter);
 	m_dataLabel->setAlignment(Qt::AlignCenter);
 
+	connect(m_fish, SIGNAL(clicked()), this, SLOT(fishButtonPressed()));
+	connect(m_data, SIGNAL(clicked()), this, SLOT(dataButtonPressed()));
+
 	QFont f("Roboto");
 	f.setPixelSize(20);
 	m_fishLabel->setFont(f);
@@ -81,4 +84,15 @@ void MainSelector::showEvent(QShowEvent *e)
 		m_dataLabel->setGeometry(400, 350, 400, 50);
 		setStyleSheet("QWidget { background-color: white; }");
 	}
+}
+
+void MainSelector::fishButtonPressed()
+{
+	qDebug() << __PRETTY_FUNCTION__;
+	emit activateFishDisplay();
+}
+
+void MainSelector::dataButtonPressed()
+{
+	qDebug() << __PRETTY_FUNCTION__;
 }

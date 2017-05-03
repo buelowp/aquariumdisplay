@@ -1,6 +1,6 @@
 TARGET = aquarium
 TEMPLATE = app
-QT += gui network widgets
+QT += gui network widgets webenginewidgets
 CONFIG += debug
 
 MOC_DIR = .moc
@@ -8,10 +8,12 @@ OBJECTS_DIR = .obj
 
 SOURCES = main.cpp \
         Aquarium.cpp \
-	MainSelector.cpp
+	MainSelector.cpp \
+	WebView.cpp
 
 HEADERS = Aquarium.h \
-	MainSelector.h
+	MainSelector.h \
+	WebView.h
 
 RESOURCES = aquarium.qrc
 
