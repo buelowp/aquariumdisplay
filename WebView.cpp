@@ -22,6 +22,8 @@ WebView::WebView(QWidget *parent) : QWidget(parent)
 	connect(m_exit, SIGNAL(clicked()), this, SLOT(exitView()));
 	connect(m_forward, SIGNAL(clicked()), this, SLOT(goForward()));
 	connect(m_back, SIGNAL(clicked()), this, SLOT(goBack()));
+	connect(m_view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
+	connect(m_view, SIGNAL(loadProgress(int)), this, SLOT(loadProgress(int)));
 
 	loadWebContent();
 }
@@ -53,6 +55,17 @@ bool WebView::event(QEvent *e)
 	}
 
 	return true;
+}
+
+void WebView::loadFinished(bool b)
+{
+	if (b)
+		qDebug() << __PRETTY_FUNCTION__;
+}
+
+void WebView::loadProgress(int p)
+{
+	qDebug() << __PRETTY_FUNCTION__ << ":" << p << "%";
 }
 
 void WebView::gestureEvent(QGestureEvent *e)

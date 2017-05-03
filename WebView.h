@@ -24,6 +24,8 @@ public slots:
 	void exitView();
 	void goBack();
 	void goForward();
+	void loadFinished(bool);
+	void loadProgress(int);
 
 signals:
 	void closeWidget();
