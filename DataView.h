@@ -16,6 +16,17 @@ class DataView : public QWidget {
 public:
 	DataView(QWidget *parent = 0);
 	virtual ~DataView();
+
+	bool setTempDeviceName(QString);
+
+protected slots:
+	void updateTemps();
+
+private:
+	QMap<QString, QFile> m_probes;
+	QMap<QString, QLabel> m_probe;
+	QMap<QString, QLabel> m_probeLabel;
+	QTimer *m_updateTemps;
 };
 
 #endif /* DATAVIEW_H_ */
