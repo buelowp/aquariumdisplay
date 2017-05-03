@@ -10,10 +10,18 @@
 
 Aquarium::Aquarium()
 {
-	m_primary = new MainSelector(this);
-	setCentralWidget(m_primary);
+	m_primary = NULL;
 }
 
 Aquarium::~Aquarium()
 {
+}
+
+void Aquarium::showEvent(QShowEvent*)
+{
+	qDebug() << __PRETTY_FUNCTION__;
+	m_primary = new MainSelector(this);
+	m_primary->setGeometry(0, 0, width(), height());
+	m_primary->init();
+	setCentralWidget(m_primary);
 }

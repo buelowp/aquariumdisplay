@@ -20,6 +20,9 @@ class Aquarium : public QMainWindow
 public:
     Aquarium();
     virtual ~Aquarium();
+
+protected:
+    void showEvent(QShowEvent*);
     
 private:
     MainSelector *m_primary;

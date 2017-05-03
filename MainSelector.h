@@ -16,16 +16,17 @@ class MainSelector : public QWidget {
 public:
 	MainSelector(QWidget *parent = 0);
 	virtual ~MainSelector();
+	void init();
 
 protected slots:
 	void showEvent(QShowEvent*);
+	void paintEvent(QPaintEvent*);
 
 private:
     QPushButton *m_fish;
     QPushButton *m_data;
     QLabel *m_fishLabel;
     QLabel *m_dataLabel;
-    QGridLayout *m_layout;
 };
 
 #endif /* MAINSELECTOR_H_ */
