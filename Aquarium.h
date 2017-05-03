@@ -12,6 +12,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <MainSelector.h>
+
 class Aquarium : public QMainWindow
 {
     Q_OBJECT
@@ -19,7 +21,8 @@ public:
     Aquarium();
     virtual ~Aquarium();
     
-    
+private:
+    MainSelector *m_primary;
 };
 
 #endif /* Aquarium_hpp */

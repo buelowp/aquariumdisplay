@@ -3,10 +3,15 @@ TEMPLATE = app
 QT += gui network widgets
 CONFIG += debug
 
-SOURCES = main.cpp \
-        Aquarium.cpp
+MOC_DIR = .moc
+OBJECTS_DIR = .obj
 
-HEADERS = Aquarium.h
+SOURCES = main.cpp \
+        Aquarium.cpp \
+	MainSelector.cpp
+
+HEADERS = Aquarium.h \
+	MainSelector.h
 
 RESOURCES = aquarium.qrc
 

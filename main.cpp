@@ -16,11 +16,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 int main(int argc, char *argv[])
 {
-    Q_INIT_RESOURCE(application);
+//    Q_INIT_RESOURCE(application);
     
     QApplication app(argc, argv);
     Aquarium aquarium;
     
+    aquarium.setGeometry(0, 0, 800, 480);
     aquarium.show();
     app.exec();
 }

@@ -10,7 +10,8 @@
 
 Aquarium::Aquarium()
 {
-    
+	m_primary = new MainSelector(this);
+	setCentralWidget(m_primary);
 }
 
 Aquarium::~Aquarium()
