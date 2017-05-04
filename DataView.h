@@ -18,15 +18,37 @@ public:
 	virtual ~DataView();
 
 	bool setTempDeviceName(QString);
+	bool setPumpDevice(QString);
+
+signals:
+	void closeWidget();
+
+protected:
+	void paintEvent(QPaintEvent*);
+	bool event(QEvent*);
 
 protected slots:
-	void updateTemps();
+	void updateDevices();
+	void exitButtonActivated();
+	void pumpToggled();
 
 private:
-	QMap<QString, QFile> m_probes;
-	QMap<QString, QLabel> m_probe;
-	QMap<QString, QLabel> m_probeLabel;
+	void updateTemps();
+	bool updatePumpState();
+	void gestureEvent(QGestureEvent*);
+	void swipeTriggered(QSwipeGesture*);
+
+	QMap<QString, QString> m_probes;
+	QMap<QString, QLabel*> m_probe;
+	QMap<QString, QLabel*> m_probeLabel;
 	QTimer *m_updateTemps;
+	QHBoxLayout *m_layout;
+	QLabel *m_pumpLabel;
+	QPushButton *m_exit;
+	QPushButton *m_pump;
+	QFile *m_pumpGpio;
+	int m_widgetIndex;
+	bool m_isMetric;
 };
 
 #endif /* DATAVIEW_H_ */

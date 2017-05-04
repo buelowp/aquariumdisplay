@@ -2,5 +2,7 @@
 <qresource>
 <file>images/fish.png</file>
 <file>images/data.png</file>
+<file>images/pump-on.jpg</file>
+<file>images/pump-off.jpg</file>
 </qresource>
 </RCC>

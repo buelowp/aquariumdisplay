@@ -95,4 +95,5 @@ void MainSelector::fishButtonPressed()
 void MainSelector::dataButtonPressed()
 {
 	qDebug() << __PRETTY_FUNCTION__;
+	emit activateDataDisplay();
 }
