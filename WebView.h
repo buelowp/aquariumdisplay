@@ -10,7 +10,6 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include <QWebEngineView>
 
 #define WEBVIEW_SEARCH_PATH		"/Users/pete/pages"
 
@@ -24,8 +23,6 @@ public slots:
 	void exitView();
 	void goBack();
 	void goForward();
-	void loadFinished(bool);
-	void loadProgress(int);
 
 signals:
 	void closeWidget();
@@ -41,7 +38,7 @@ private:
 	QPushButton *m_exit;
 	QPushButton *m_forward;
 	QPushButton *m_back;
-	QWebEngineView *m_view;
+	QTextBrowser *m_view;
 	QVector<QString> m_content;
 
 	int m_position;

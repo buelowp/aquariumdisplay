@@ -13,6 +13,8 @@ Aquarium::Aquarium()
 	m_primary = NULL;
 	m_fishview = NULL;
 	m_dataview = NULL;
+
+	m_lights = new Lights(10, this);
 }
 
 Aquarium::~Aquarium()

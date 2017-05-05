@@ -15,6 +15,7 @@
 #include "MainSelector.h"
 #include "WebView.h"
 #include "DataView.h"
+#include "Lights.h"
 
 class Aquarium : public QMainWindow
 {
@@ -36,6 +37,7 @@ private:
     MainSelector *m_primary;
     WebView *m_fishview;
     DataView *m_dataview;
+    Lights *m_lights;
 };
 
 #endif /* Aquarium_hpp */

@@ -10,8 +10,9 @@
 WebView::WebView(QWidget *parent) : QWidget(parent)
 {
 	m_position = 0;
-	m_view = new QWebEngineView(this);
+	m_view = new QTextBrowser(this);
 	m_view->setGeometry(0, 0, 800, 480);
+	m_view->setReadOnly(true);
 	m_exit = new QPushButton("X", this);
 	m_forward = new QPushButton("->", this);
 	m_back = new QPushButton("<-", this);
@@ -22,8 +23,6 @@ WebView::WebView(QWidget *parent) : QWidget(parent)
 	connect(m_exit, SIGNAL(clicked()), this, SLOT(exitView()));
 	connect(m_forward, SIGNAL(clicked()), this, SLOT(goForward()));
 	connect(m_back, SIGNAL(clicked()), this, SLOT(goBack()));
-	connect(m_view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
-	connect(m_view, SIGNAL(loadProgress(int)), this, SLOT(loadProgress(int)));
 
 	loadWebContent();
 }
@@ -42,8 +41,8 @@ bool WebView::event(QEvent *e)
 	switch (e->type()) {
 	case QEvent::Show:
 		{
-			QUrl u("https://en.wikipedia.org/wiki/Neon_tetra");
-			m_view->load(u);
+			QUrl u(m_content[0]);
+			m_view->setSource(u);
 			m_view->show();
 		}
 		break;
@@ -55,17 +54,6 @@ bool WebView::event(QEvent *e)
 	}
 
 	return true;
-}
-
-void WebView::loadFinished(bool b)
-{
-	if (b)
-		qDebug() << __PRETTY_FUNCTION__;
-}
-
-void WebView::loadProgress(int p)
-{
-	qDebug() << __PRETTY_FUNCTION__ << ":" << p << "%";
 }
 
 void WebView::gestureEvent(QGestureEvent *e)
@@ -120,7 +108,7 @@ void WebView::goForward()
 
 	qDebug() << __PRETTY_FUNCTION__ << ":" << m_position;
 	QUrl u(QString("file:///") + m_content[m_position]);
-	m_view->load(u);
+	m_view->setSource(u);
 }
 
 void WebView::goBack()
@@ -132,5 +120,5 @@ void WebView::goBack()
 
 	qDebug() << __PRETTY_FUNCTION__ << ":" << m_position;
 	QUrl u(QString("file:///") + m_content[m_position]);
-	m_view->load(u);
+	m_view->setSource(u);
 }
