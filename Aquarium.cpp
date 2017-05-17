@@ -14,7 +14,7 @@ Aquarium::Aquarium()
 	m_fishview = NULL;
 	m_dataview = NULL;
 
-	m_lights = new Lights(10, this);
+	m_lights = new Lights(this);
 }
 
 Aquarium::~Aquarium()
