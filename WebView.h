@@ -11,7 +11,7 @@
 #include <QtCore>
 #include <QtWidgets>
 
-#define WEBVIEW_SEARCH_PATH		"/Users/pete/pages"
+#define WEBVIEW_SEARCH_PATH		"/var/html/pages"
 
 class WebView : public QWidget {
 	Q_OBJECT
@@ -42,6 +42,7 @@ private:
 	QVector<QString> m_content;
 
 	int m_position;
+	bool m_contentAvailable;
 };
 
 #endif /* WEBVIEW_H_ */

@@ -20,6 +20,8 @@ WebView::WebView(QWidget *parent) : QWidget(parent)
 	m_forward->setGeometry(740, 350, 25, 25);
 	m_back->setGeometry(10, 350, 25, 25);
 
+	m_contentAvailable = false;
+
 	connect(m_exit, SIGNAL(clicked()), this, SLOT(exitView()));
 	connect(m_forward, SIGNAL(clicked()), this, SLOT(goForward()));
 	connect(m_back, SIGNAL(clicked()), this, SLOT(goBack()));
@@ -87,10 +89,15 @@ void WebView::loadWebContent()
 	dirp.setFilter(QDir::Files);
 	dirp.setNameFilters(webfiles);
 
-	foreach (QFileInfo item, dirp.entryInfoList()) {
-		qDebug() << __PRETTY_FUNCTION__ << item.fileName();
-		m_content.push_back(item.absoluteFilePath());
+	if (dirp.exists()) {
+		foreach (QFileInfo item, dirp.entryInfoList()) {
+			qDebug() << __PRETTY_FUNCTION__ << item.fileName();
+			m_content.push_back(item.absoluteFilePath());
+			m_contentAvailable = true;
+		}
 	}
+	else
+		m_contentAvailable = false;
 }
 
 void WebView::exitView()
@@ -101,24 +108,28 @@ void WebView::exitView()
 
 void WebView::goForward()
 {
-	if (m_position + 1 < m_content.size())
-		m_position++;
-	else
-		m_position = 0;
+	if (m_contentAvailable) {
+		if (m_position + 1 < m_content.size())
+			m_position++;
+		else
+			m_position = 0;
 
-	qDebug() << __PRETTY_FUNCTION__ << ":" << m_position;
-	QUrl u(QString("file:///") + m_content[m_position]);
-	m_view->setSource(u);
+		qDebug() << __PRETTY_FUNCTION__ << ":" << m_position;
+		QUrl u(QString("file:///") + m_content[m_position]);
+		m_view->setSource(u);
+	}
 }
 
 void WebView::goBack()
 {
-	if (m_position > 0)
-		m_position--;
-	else
-		m_position = m_content.size() - 1;
+	if (m_contentAvailable) {
+		if (m_position > 0)
+			m_position--;
+		else
+			m_position = m_content.size() - 1;
 
-	qDebug() << __PRETTY_FUNCTION__ << ":" << m_position;
-	QUrl u(QString("file:///") + m_content[m_position]);
-	m_view->setSource(u);
+		qDebug() << __PRETTY_FUNCTION__ << ":" << m_position;
+		QUrl u(QString("file:///") + m_content[m_position]);
+		m_view->setSource(u);
+	}
 }

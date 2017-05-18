@@ -3,7 +3,7 @@ TEMPLATE = app
 QT += gui network widgets
 CONFIG += debug
 
-INCLUDEPATH = /usr/local/include
+INCLUDEPATH = /usr/local/include /usr/local/include/FastLED
 LIBS += -L/usr/local/lib -lpixelbone -lsunset
 
 MOC_DIR = .moc
