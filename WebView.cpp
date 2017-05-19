@@ -26,6 +26,9 @@ WebView::WebView(QWidget *parent) : QWidget(parent)
 	connect(m_forward, SIGNAL(clicked()), this, SLOT(goForward()));
 	connect(m_back, SIGNAL(clicked()), this, SLOT(goBack()));
 
+	setAttribute(Qt::WA_AcceptTouchEvents);
+	grabGesture(Qt::SwipeGesture);
+
 	loadWebContent();
 }
 
@@ -40,37 +43,56 @@ WebView::~WebView()
 
 bool WebView::event(QEvent *e)
 {
-	switch (e->type()) {
-	case QEvent::Show:
-		{
+	if (e->type() == QEvent::Show) {
+		if (m_contentAvailable) {
 			QUrl u(m_content[0]);
 			m_view->setSource(u);
 			m_view->show();
 		}
-		break;
-	case QEvent::Gesture:
+		return true;
+	}
+	if (e->type() == QEvent::Gesture) {
 		gestureEvent(static_cast<QGestureEvent*>(e));
-		break;
-	default:
-		break;
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 void WebView::gestureEvent(QGestureEvent *e)
 {
+	QGesture *swipe = NULL;
+
 	qDebug() << __PRETTY_FUNCTION__;
-    if (QGesture *swipe = e->gesture(Qt::SwipeGesture))
-        swipeTriggered(static_cast<QSwipeGesture *>(swipe));
+	if ((swipe = e->gesture(Qt::SwipeGesture)) != NULL) {
+		qDebug() << __PRETTY_FUNCTION__ << "Swipe";
+		swipeTriggered(static_cast<QSwipeGesture *>(swipe));
+	}
+	else if ((swipe = e->gesture(Qt::PanGesture)) != NULL) {
+		qDebug() << __PRETTY_FUNCTION__ << "Pan";
+	}
+	else if ((swipe = e->gesture(Qt::PinchGesture)) != NULL) {
+		qDebug() << __PRETTY_FUNCTION__ << "Pinch";
+	}
+	else if ((swipe = e->gesture(Qt::CustomGesture)) != NULL) {
+		qDebug() << __PRETTY_FUNCTION__ << "Custom";
+	}
+	else if ((swipe = e->gesture(Qt::TapGesture)) != NULL) {
+		qDebug() << __PRETTY_FUNCTION__ << "Tap";
+	}
+	else if ((swipe = e->gesture(Qt::TapAndHoldGesture)) != NULL){
+		qDebug() << __PRETTY_FUNCTION__ << "Tap and hold";
+	}
+	else
+		qDebug() << __PRETTY_FUNCTION__ << ": e->type() is" << e->type();
 }
 
 void WebView::swipeTriggered(QSwipeGesture *gesture)
 {
     if (gesture->state() == Qt::GestureFinished) {
         if (gesture->horizontalDirection() == QSwipeGesture::Left) {
-        	goBack();
             qDebug() << "swipeTriggered(): swipe to previous";
+		goBack();
         }
         else if (gesture->horizontalDirection() == QSwipeGesture::Right) {
             qDebug() << "swipeTriggered(): swipe to next";
@@ -91,7 +113,6 @@ void WebView::loadWebContent()
 
 	if (dirp.exists()) {
 		foreach (QFileInfo item, dirp.entryInfoList()) {
-			qDebug() << __PRETTY_FUNCTION__ << item.fileName();
 			m_content.push_back(item.absoluteFilePath());
 			m_contentAvailable = true;
 		}

@@ -15,6 +15,7 @@ Aquarium::Aquarium()
 	m_dataview = NULL;
 
 	m_lights = new Lights(this);
+	setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowCloseButtonHint);
 }
 
 Aquarium::~Aquarium()
@@ -23,7 +24,6 @@ Aquarium::~Aquarium()
 
 void Aquarium::showEvent(QShowEvent*)
 {
-	qDebug() << __PRETTY_FUNCTION__;
 	m_primary = new MainSelector(this);
 	m_primary->setGeometry(0, 0, width(), height());
 	m_primary->init();

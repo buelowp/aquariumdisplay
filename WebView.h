@@ -11,7 +11,7 @@
 #include <QtCore>
 #include <QtWidgets>
 
-#define WEBVIEW_SEARCH_PATH		"/var/html/pages"
+#define WEBVIEW_SEARCH_PATH		"/var/www/pages"
 
 class WebView : public QWidget {
 	Q_OBJECT
