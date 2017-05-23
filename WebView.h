@@ -32,17 +32,19 @@ protected:
 
 private:
 	void loadWebContent();
-	void gestureEvent(QGestureEvent*);
+	bool endTouchEvent(QTouchEvent*);
+	void beginTouchEvent(QTouchEvent*);
 	void swipeTriggered(QSwipeGesture*);
 
 	QPushButton *m_exit;
-	QPushButton *m_forward;
-	QPushButton *m_back;
 	QTextBrowser *m_view;
 	QVector<QString> m_content;
 
 	int m_position;
 	bool m_contentAvailable;
+	QPointF m_touchBegin;
+	QPointF m_touchEnd;
+	bool m_tapEvent;
 };
 
 #endif /* WEBVIEW_H_ */

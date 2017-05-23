@@ -14,44 +14,25 @@ WebView::WebView(QWidget *parent) : QWidget(parent)
 	m_view->setGeometry(0, 0, 800, 480);
 	m_view->setReadOnly(true);
 	m_exit = new QPushButton("X", this);
-	m_forward = new QPushButton("->", this);
-	m_back = new QPushButton("<-", this);
 	m_exit->setGeometry(770, 10, 25, 25);
-	m_forward->setGeometry(740, 350, 25, 25);
-	m_back->setGeometry(10, 350, 25, 25);
 
 	m_contentAvailable = false;
 
 	connect(m_exit, SIGNAL(clicked()), this, SLOT(exitView()));
-	connect(m_forward, SIGNAL(clicked()), this, SLOT(goForward()));
-	connect(m_back, SIGNAL(clicked()), this, SLOT(goBack()));
 
 	setAttribute(Qt::WA_AcceptTouchEvents);
-	grabGesture(Qt::SwipeGesture);
 
 	loadWebContent();
-
-	QFontDatabase database;
-	foreach (const QString &family, database.families()) {
-		qDebug() << __PRETTY_FUNCTION__ << ": Family" << family;
-		foreach (const QString &style, database.styles(family)) {
-			qDebug() << __PRETTY_FUNCTION__ << ": Style" << style;
-		}
-	}
 }
 
 WebView::~WebView()
 {
-	qDebug() << __PRETTY_FUNCTION__;
-	delete m_back;
-	delete m_forward;
 	delete m_exit;
 	delete m_view;
 }
 
 bool WebView::event(QEvent *e)
 {
-	qDebug() << __PRETTY_FUNCTION__ << ": e->type()" << e->type();
 	if (e->type() == QEvent::Show) {
 		if (m_contentAvailable) {
 			QUrl u(m_content[0]);
@@ -60,54 +41,49 @@ bool WebView::event(QEvent *e)
 		}
 		return true;
 	}
-	if (e->type() == QEvent::Gesture) {
-		gestureEvent(static_cast<QGestureEvent*>(e));
+	if (e->type() == QEvent::TouchBegin) {
+		beginTouchEvent(static_cast<QTouchEvent*>(e));
 		return true;
+	}
+	if (e->type() == QEvent::TouchEnd) {
+		return endTouchEvent(static_cast<QTouchEvent*>(e));
 	}
 
 	return false;
 }
 
-void WebView::gestureEvent(QGestureEvent *e)
+void WebView::beginTouchEvent(QTouchEvent *e)
 {
-	QGesture *swipe = NULL;
-
-	qDebug() << __PRETTY_FUNCTION__;
-	if ((swipe = e->gesture(Qt::SwipeGesture)) != NULL) {
-		qDebug() << __PRETTY_FUNCTION__ << "Swipe";
-		swipeTriggered(static_cast<QSwipeGesture *>(swipe));
-	}
-	else if ((swipe = e->gesture(Qt::PanGesture)) != NULL) {
-		qDebug() << __PRETTY_FUNCTION__ << "Pan";
-	}
-	else if ((swipe = e->gesture(Qt::PinchGesture)) != NULL) {
-		qDebug() << __PRETTY_FUNCTION__ << "Pinch";
-	}
-	else if ((swipe = e->gesture(Qt::CustomGesture)) != NULL) {
-		qDebug() << __PRETTY_FUNCTION__ << "Custom";
-	}
-	else if ((swipe = e->gesture(Qt::TapGesture)) != NULL) {
-		qDebug() << __PRETTY_FUNCTION__ << "Tap";
-	}
-	else if ((swipe = e->gesture(Qt::TapAndHoldGesture)) != NULL){
-		qDebug() << __PRETTY_FUNCTION__ << "Tap and hold";
-	}
-	else
-		qDebug() << __PRETTY_FUNCTION__ << ": e->type() is" << e->type();
+	QList<QTouchEvent::TouchPoint> points = e->touchPoints();
+	QTouchEvent::TouchPoint pos = points.at(0);
+	m_touchBegin = pos.pos();
 }
 
-void WebView::swipeTriggered(QSwipeGesture *gesture)
+bool WebView::endTouchEvent(QTouchEvent *e)
 {
-    if (gesture->state() == Qt::GestureFinished) {
-        if (gesture->horizontalDirection() == QSwipeGesture::Left) {
-            qDebug() << "swipeTriggered(): swipe to previous";
-		goBack();
-        }
-        else if (gesture->horizontalDirection() == QSwipeGesture::Right) {
-            qDebug() << "swipeTriggered(): swipe to next";
-            goForward();
-        }
-    }
+	QList<QTouchEvent::TouchPoint> points = e->touchPoints();
+	QTouchEvent::TouchPoint pos = points.at(0);
+	m_touchEnd = pos.pos();
+
+	if (m_touchBegin == m_touchEnd) {
+		if (m_tapEvent) {
+			m_tapEvent = false;
+			exitView();
+		}
+		else
+			m_tapEvent = true;
+
+	}
+	else if ((m_touchEnd.y() > m_touchBegin.y() - 100) && (m_touchEnd.y() < m_touchBegin.y() + 100)) {
+		if (m_touchBegin.x() - m_touchEnd.x() > 200) {
+			goBack();
+		}
+		else if ((m_touchEnd.x() - m_touchBegin.x()) > -200) {
+			goForward();
+		}
+		return true;
+	}
+	return false;
 }
 
 void WebView::loadWebContent()
@@ -134,7 +110,6 @@ void WebView::loadWebContent()
 
 void WebView::exitView()
 {
-	qDebug() << __PRETTY_FUNCTION__;
 	emit closeWidget();
 }
 
@@ -146,7 +121,6 @@ void WebView::goForward()
 		else
 			m_position = 0;
 
-		qDebug() << __PRETTY_FUNCTION__ << ":" << m_position;
 		QUrl u(QString("file:///") + m_content[m_position]);
 		m_view->setSource(u);
 	}
@@ -160,7 +134,6 @@ void WebView::goBack()
 		else
 			m_position = m_content.size() - 1;
 
-		qDebug() << __PRETTY_FUNCTION__ << ":" << m_position;
 		QUrl u(QString("file:///") + m_content[m_position]);
 		m_view->setSource(u);
 	}
