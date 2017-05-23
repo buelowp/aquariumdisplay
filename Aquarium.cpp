@@ -16,6 +16,8 @@ Aquarium::Aquarium()
 
 	m_lights = new Lights(this);
 	setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowCloseButtonHint);
+
+	QFontDatabase::addApplicationFont("/usr/share/fonts/truetype/roboto/Roboto-Regular.ttf");
 }
 
 Aquarium::~Aquarium()

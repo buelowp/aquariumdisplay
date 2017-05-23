@@ -30,6 +30,14 @@ WebView::WebView(QWidget *parent) : QWidget(parent)
 	grabGesture(Qt::SwipeGesture);
 
 	loadWebContent();
+
+	QFontDatabase database;
+	foreach (const QString &family, database.families()) {
+		qDebug() << __PRETTY_FUNCTION__ << ": Family" << family;
+		foreach (const QString &style, database.styles(family)) {
+			qDebug() << __PRETTY_FUNCTION__ << ": Style" << style;
+		}
+	}
 }
 
 WebView::~WebView()
@@ -43,6 +51,7 @@ WebView::~WebView()
 
 bool WebView::event(QEvent *e)
 {
+	qDebug() << __PRETTY_FUNCTION__ << ": e->type()" << e->type();
 	if (e->type() == QEvent::Show) {
 		if (m_contentAvailable) {
 			QUrl u(m_content[0]);
@@ -111,8 +120,10 @@ void WebView::loadWebContent()
 	dirp.setFilter(QDir::Files);
 	dirp.setNameFilters(webfiles);
 
+	qDebug() << __PRETTY_FUNCTION__ << ": Searching" << WEBVIEW_SEARCH_PATH;
 	if (dirp.exists()) {
 		foreach (QFileInfo item, dirp.entryInfoList()) {
+			qDebug() << __PRETTY_FUNCTION__ << ":" << item.absoluteFilePath();
 			m_content.push_back(item.absoluteFilePath());
 			m_contentAvailable = true;
 		}
