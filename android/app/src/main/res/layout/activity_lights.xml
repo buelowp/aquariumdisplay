@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.home.pete.aquarium.LightsActivity">
+
+    <SeekBar
+        android:id="@+id/seekBar_brightness"
+        android:layout_width="500dp"
+        android:layout_height="50dp"
+        tools:layout_editor_absoluteX="214dp"
+        tools:layout_editor_absoluteY="234dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="32dp"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="150dp" />
+
+    <ToggleButton
+        android:id="@+id/toggleButton_UVLights"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="52dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_UVLights"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="89dp" />
+
+    <ToggleButton
+        android:id="@+id/toggleButton_dayLights"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toEndOf="@+id/toggleButton_UVLights"
+        app:layout_constraintTop_toBottomOf="@+id/textView_dayLights"
+        tools:layout_editor_absoluteX="214dp"
+        tools:layout_editor_absoluteY="94dp" />
+
+    <TextView
+        android:id="@+id/textView_UVLights"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="52dp"
+        android:layout_marginTop="32dp"
+        android:foregroundGravity="center_vertical|center_horizontal"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/button_title_uv_lights"
+        android:textAlignment="center"
+        android:textColor="@android:color/background_light"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="36dp"
+        tools:layout_editor_absoluteY="47dp" />
+
+    <TextView
+        android:id="@+id/textView_dayLights"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:foregroundGravity="center"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="Day Lights"
+        android:textAlignment="center"
+        android:textColor="@android:color/background_light"
+        android:textSize="24sp"
+        app:layout_constraintStart_toEndOf="@+id/textView_UVLights"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="237dp"
+        tools:layout_editor_absoluteY="42dp" />
+
+    <TextView
+        android:id="@+id/textView_setBrightness"
+        android:layout_width="500dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="150dp"
+        android:gravity="fill_vertical|fill_horizontal"
+        android:text="@string/textview_set_brightness"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/seekBar_brightness"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteX="367dp"
+        tools:layout_editor_absoluteY="282dp" />
+
+    <TextView
+        android:id="@+id/textView_allLights"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/button_title_all_lights"
+        android:textColor="@android:color/background_light"
+        android:textSize="24sp"
+        app:layout_constraintStart_toEndOf="@+id/textView_dayLights"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="598dp"
+        tools:layout_editor_absoluteY="50dp" />
+
+    <ToggleButton
+        android:id="@+id/toggleButton_allLights"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toEndOf="@+id/toggleButton_dayLights"
+        app:layout_constraintTop_toBottomOf="@+id/textView_allLights"
+        tools:layout_editor_absoluteX="598dp"
+        tools:layout_editor_absoluteY="178dp" />
+
+    <Button
+        android:id="@+id/button_brightSun"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="52dp"
+        android:onClick="setToBrightSunlight"
+        android:text="@string/button_title_brightsun"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteX="115dp"
+        tools:layout_editor_absoluteY="191dp" />
+
+    <Button
+        android:id="@+id/button_cloudy"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:onClick="setToCloudyLight"
+        android:text="@string/button_title_cloudy"
+        app:layout_constraintStart_toEndOf="@+id/button_brightSun"
+        tools:layout_editor_absoluteX="255dp"
+        tools:layout_editor_absoluteY="191dp" />
+
+    <Button
+        android:id="@+id/button_moonlight"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:onClick="setToMoonLight"
+        android:text="@string/button_title_moon"
+        app:layout_constraintStart_toEndOf="@+id/button_cloudy"
+        tools:layout_editor_absoluteX="441dp"
+        tools:layout_editor_absoluteY="191dp" />
+
+    <Button
+        android:id="@+id/button_sunset"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:onClick="setToSunset"
+        android:text="@string/button_title_sunset"
+        app:layout_constraintStart_toEndOf="@+id/button_moonlight"
+        tools:layout_editor_absoluteX="657dp"
+        tools:layout_editor_absoluteY="191dp" />
+
+    <TextView
+        android:id="@+id/textView_resetProgram"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/textview_resetprogram"
+        android:textColor="@android:color/background_light"
+        android:textSize="24sp"
+        app:layout_constraintStart_toEndOf="@+id/textView_allLights"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="616dp"
+        tools:layout_editor_absoluteY="42dp" />
+
+    <Button
+        android:id="@+id/button_reset"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:onClick="restartLightProgram"
+        android:text="@string/button_title_resetprogram"
+        app:layout_constraintStart_toEndOf="@+id/toggleButton_allLights"
+        app:layout_constraintTop_toBottomOf="@+id/textView_resetProgram"
+        tools:layout_editor_absoluteX="630dp"
+        tools:layout_editor_absoluteY="80dp" />
+</android.support.constraint.ConstraintLayout>

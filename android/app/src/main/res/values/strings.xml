@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Aquarium</string>
+    <string name="title_activity_webview">See the Fish</string>
+    <string name="title_activity_settings">Manage Settings</string>
+    <string name="title_activity_lightsview">Manage the Lights</string>
+    <string name="button_title_moon">Moon Light</string>
+    <string name="button_title_sunset">Sunset</string>
+    <string name="button_title_brightsun">Bright Sun</string>
+    <string name="button_title_cloudy">Cloudy</string>
+    <string name="button_title_resetprogram">Reset</string>
+    <string name="textview_resetprogram">Reset Prog</string>
+    <string name="button_title_all_lights">All Lights</string>
+    <string name="button_title_day_lights">Day Lights</string>
+    <string name="button_title_uv_lights">UV Lights</string>
+    <string name="textview_set_brightness">Set Tank Brightness</string>
+    <string name="textview_temp_right_string">Right Temperature</string>
+    <string name="textview_temp_left_string">Left Temperature</string>
+    <string name="textview_sunrise">Sunrise:</string>
+    <string name="textview_sunset">Sunset:</string>
+    <string name="textview_moonphase">Moonphase:</string>
+</resources>

@@ -1,0 +1,20 @@
+# temp files
+*.bak
+*.bck
+*.kicad_pcb-bak
+*-cache.lib
+# *-rescue.lib
+ftp-lib-table
+
+# for external tools
+*.dsn
+
+*.iml
+.gradle
+/android/local.properties
+/android/.idea/workspace.xml
+/android/.idea/libraries
+.DS_Store
+/android/build
+/android/captures
+.externalNativeBuild
