@@ -11,15 +11,15 @@
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="53dp"
-        android:layout_marginStart="264dp"
         android:onClick="changeFilter"
         android:text="Change the Filter"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/button_ChangeWater"
         tools:ignore="HardcodedText"
         tools:layout_editor_absoluteX="532dp"
-        tools:layout_editor_absoluteY="164dp" />
+        tools:layout_editor_absoluteY="164dp"
+        android:layout_marginEnd="68dp"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <ToggleButton
         android:id="@+id/toggle_LightState"
@@ -28,7 +28,6 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="8dp"
         android:onClick="toggleSystem"
-        android:text="ToggleButton"
         android:textSize="30sp"
         app:layout_constraintStart_toEndOf="@+id/toggle_HeaterState"
         app:layout_constraintTop_toBottomOf="@+id/textView_LightState"
@@ -41,7 +40,6 @@
         android:layout_marginStart="68dp"
         android:layout_marginTop="8dp"
         android:onClick="togglePump"
-        android:text="ToggleButton"
         android:textSize="30sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView_PumpState"
@@ -68,7 +66,7 @@
         android:layout_marginStart="68dp"
         android:layout_marginTop="32dp"
         android:gravity="center_horizontal"
-        android:text="Pump State"
+        android:text="@string/textview_pump_state"
         android:textAlignment="center"
         android:textSize="30sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -83,7 +81,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
         android:gravity="center_horizontal"
-        android:text="Heater State"
+        android:text="@string/textview_heater_state"
         android:textAlignment="center"
         android:textSize="30sp"
         app:layout_constraintStart_toEndOf="@+id/textView_PumpState"
@@ -98,7 +96,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
         android:gravity="center_horizontal"
-        android:text="System Is"
+        android:text="@string/textview_light_state"
         android:textAlignment="center"
         android:textSize="30sp"
         app:layout_constraintStart_toEndOf="@+id/textView_HeaterState"
@@ -117,7 +115,9 @@
         android:textSize="22sp"
         app:layout_constraintTop_toBottomOf="@+id/toggle_HeaterState"
         tools:layout_editor_absoluteX="300dp"
-        tools:layout_editor_absoluteY="176dp" />
+        tools:layout_editor_absoluteY="176dp"
+        android:layout_marginStart="32dp"
+        app:layout_constraintStart_toEndOf="@+id/textView_TempLeftString" />
 
     <Button
         android:id="@+id/button_ChangeWater"
@@ -126,7 +126,7 @@
         android:layout_marginBottom="53dp"
         android:layout_marginStart="68dp"
         android:onClick="changeWater"
-        android:text="Change the Water"
+        android:text="@string/button_change_water"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -139,26 +139,28 @@
         android:layout_height="32dp"
         android:layout_marginTop="32dp"
         android:gravity="center_vertical|center_horizontal"
-        android:text="Water Level"
+        android:text="@string/textview_water_level_string"
         android:textAlignment="center"
         android:textSize="24sp"
         app:layout_constraintTop_toBottomOf="@+id/toggle_LightState"
         tools:layout_editor_absoluteX="532dp"
-        tools:layout_editor_absoluteY="164dp" />
+        tools:layout_editor_absoluteY="164dp"
+        android:layout_marginStart="32dp"
+        app:layout_constraintStart_toEndOf="@+id/textView_TempRightString" />
 
     <TextView
         android:id="@+id/textView_WaterLevel"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="68dp"
         android:layout_marginTop="16dp"
         android:gravity="center_vertical|center_horizontal"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView_WaterLevelString"
         tools:layout_editor_absoluteX="532dp"
-        tools:layout_editor_absoluteY="208dp" />
+        tools:layout_editor_absoluteY="208dp"
+        android:layout_marginStart="32dp"
+        app:layout_constraintStart_toEndOf="@+id/textView_TempRight" />
 
     <TextView
         android:id="@+id/textView_sunrise"
@@ -221,7 +223,6 @@
         android:layout_height="32dp"
         android:layout_marginStart="68dp"
         android:layout_marginTop="32dp"
-        android:text="TextView"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toggle_PumpState"
@@ -244,13 +245,15 @@
 
     <TextView
         android:id="@+id/textView_sunrise_value"
-        android:layout_width="82"
+        android:layout_width="82dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:textSize="18sp"
         app:layout_constraintStart_toEndOf="@+id/textView_sunrise"
         tools:layout_editor_absoluteX="423dp"
-        tools:layout_editor_absoluteY="319dp" />
+        tools:layout_editor_absoluteY="319dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/textView_sunset_value" />
 
     <TextView
         android:id="@+id/textView_sunset_value"
@@ -258,7 +261,11 @@
         android:layout_height="wrap_content"
         android:textSize="18sp"
         tools:layout_editor_absoluteX="418dp"
-        tools:layout_editor_absoluteY="359dp" />
+        tools:layout_editor_absoluteY="359dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@+id/textView_sunset"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/textView_moonphase_value" />
 
     <TextView
         android:id="@+id/textView_moonphase_value"
