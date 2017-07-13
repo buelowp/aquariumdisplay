@@ -21,6 +21,7 @@
     <string name="textview_pump_state">Pump State</string>
     <string name="textview_heater_state">Heater State</string>
     <string name="textview_light_state">System Is</string>
-    <string name="button_change_water">Change The Water</string>
+    <string name="button_change_water">Change the Water</string>
     <string name="textview_water_level_string">Water Level</string>
+    <string name="button_change_the_filter">Change the Filter</string>
 </resources>
