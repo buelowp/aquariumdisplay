@@ -65,22 +65,28 @@ void restartProgram()
   
 }
 
-void setLedColor(byte r, byte g, byte b)
+void setLedColor(byte msg[], int bytes)
 {
+  if (bytes != 3)
+    return;
+    
   Serial.println("Request to set the LED color");
   for (int i = 0; i < NUM_LEDS; i++) {
-    leds[i].r = r;
-    leds[i].g = g;
-    leds[i].b = b;
+    leds[i].r = msg[0];
+    leds[i].g = msg[1];
+    leds[i].b = msg[2];
   }
   FastLED.show();
 }
 
-void setLedBrightness(byte b)
+void setLedBrightness(byte b[], int bytes)
 {
+  if (bytes != 1)
+    return;
+    
   Serial.print("Request to set LED strip to brightness value ");
-  Serial.println(b);
-  FastLED.setBrightness(b);
+  Serial.println(msg[0]);
+  FastLED.setBrightness(msg[0]);
   FastLED.show();
 }
 
@@ -124,10 +130,12 @@ void getTemps()
   Serial1.write(response, 12);
 }
 
-void toggleUV(byte flag)
+void toggleUV(byte msg[], int bytes)
 {
-  
-  if (flag == 0x01) {
+  if (bytes > 1)
+    return;
+    
+  if (msg[0] == 0x01) {
     Serial.println("Turning on UV lights");
     digitalWrite(UV_PIN, 1);
   }
@@ -205,66 +213,88 @@ void getSunLightState()
 
 void parseThingsMsg(byte msg[])
 {
+  int index = 0;
+  int j;
+  byte contents[128];
+  
   if (msg[0] == 0xF0) {
-    switch (msg[2]) {
-      case 0xAA:
-        replyHello();
-        break;
-      case 0xFF:
-        shutdownDevice();
-        break;
-      case 0x01:
-        setLedColor(msg[3], msg[4], msg[5]);
-        break;
-      case 0x02:
-        setLedBrightness(msg[3]);
-        break;
-      case 0x03:
-        getWaterLevel();
-        break;
-      case 0x04:
-        getTemps();
-        break;
-      case 0x05:
-        toggleUV(msg[3]);
-        break;
-      case 0x06:
-        restartProgram();
-        break;
-      case 0x07:
-        getUVState();
-        break;
-      case 0x08:
-        getPumpState();
-        break;
-      case 0x09:
-        getHeaterState();
-        break;
-      case 0x0A:
-        turnOffSunLights();
-        break;
-      case 0x0B:
-        toggleAllLights();
-        break;
-      case 0x0C:
-        getSunLightState();
-        break;
-      case 0x0D:
-        togglePumpState();
-        break;
-      case 0x0E:
-        toggleHeaterState();
-        break;
-      default:
-        Serial.println("Unknown message");
-        for (int i = 0; i < 10; i++) {
-          if (msg[i] == 0xF1) {
-            Serial.println(msg[i], HEX);
-            break;
+    for (int i = 0; i < msg[2]; i++) {
+      if (i == 0) {
+        index = 3;
+      }
+      else {
+        index = index + msg[index + 1]
+      }
+      Serial.print("Checking message at index: ");
+      Serial.println(index);
+      Serial.print("This message is sized: ");
+      Serial.println(msg[index + 1]);
+      Serial.print("The message is :");
+      Serial.println(msg[index]);
+
+      for (j = 0; j < msg[index + 1] -1 ; j++) {
+        contents[j] = msg[index + j + 2];
+      }
+      switch (msg[index]) {
+        case 0xAA:
+          replyHello();
+          break;
+        case 0xFF:
+          shutdownDevice();
+          break;
+        case 0x01:
+          setLedColor(contents, j);
+          break;
+        case 0x02:
+          setLedBrightness(contents, j);
+          break;
+        case 0x03:
+          getWaterLevel();
+          break;
+        case 0x04:
+          getTemps();
+          break;
+        case 0x05:
+          toggleUV(contents, j);
+          break;
+        case 0x06:
+          restartProgram();
+          break;
+        case 0x07:
+          getUVState();
+          break;
+        case 0x08:
+          getPumpState();
+          break;
+        case 0x09:
+          getHeaterState();
+          break;
+        case 0x0A:
+          turnOffSunLights();
+          break;
+        case 0x0B:
+          toggleAllLights();
+          break;
+        case 0x0C:
+          getSunLightState();
+          break;
+        case 0x0D:
+          togglePumpState();
+          break;
+        case 0x0E:
+          toggleHeaterState();
+          break;
+        default:
+          Serial.println("Unknown message");
+          for (int i = 0; i < 10; i++) {
+            if (msg[i] == 0xF1) {
+              Serial.println(msg[i], HEX);
+              break;
+            }
+            Serial.print(msg[i], HEX);
+            Serial.print(" ");
           }
-          Serial.print(msg[i], HEX);
-          Serial.print(" ");
-        }
+      }      
     }
   }
 }
