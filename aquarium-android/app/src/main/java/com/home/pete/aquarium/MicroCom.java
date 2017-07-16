@@ -133,6 +133,15 @@ public class MicroCom {
         }
     }
 
+    public void sendPreformattedMsg(byte[] msg) {
+        try {
+            writeData(msg);
+        }
+        catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
+    }
+
     private void configureDevice() throws IOException {
         m_device.setBaudrate(115200);
         m_device.setDataSize(8);

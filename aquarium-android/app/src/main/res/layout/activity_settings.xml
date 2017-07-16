@@ -168,6 +168,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:layout_marginStart="32dp"
+        android:gravity="right|center_vertical"
         android:text="@string/textview_sunrise"
         android:textAlignment="textStart"
         android:textSize="18sp"
@@ -182,6 +183,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:layout_marginStart="32dp"
+        android:gravity="right|center_vertical"
         android:text="@string/textview_sunset"
         android:textAlignment="textStart"
         android:textSize="18sp"
@@ -196,6 +198,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
         android:layout_marginStart="32dp"
+        android:gravity="right|center_vertical"
         android:text="@string/textview_moonphase"
         android:textAlignment="textStart"
         android:textSize="18sp"
@@ -248,25 +251,27 @@
         android:id="@+id/textView_sunrise_value"
         android:layout_width="82dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:layout_marginStart="8dp"
+        android:gravity="right|center_vertical"
         android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/textView_sunset_value"
         app:layout_constraintStart_toEndOf="@+id/textView_sunrise"
         tools:layout_editor_absoluteX="423dp"
-        tools:layout_editor_absoluteY="319dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/textView_sunset_value" />
+        tools:layout_editor_absoluteY="319dp" />
 
     <TextView
         android:id="@+id/textView_sunset_value"
         android:layout_width="82dp"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
-        tools:layout_editor_absoluteX="418dp"
-        tools:layout_editor_absoluteY="359dp"
-        android:layout_marginStart="8dp"
-        app:layout_constraintStart_toEndOf="@+id/textView_sunset"
         android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/textView_moonphase_value" />
+        android:layout_marginStart="8dp"
+        android:gravity="right|center_vertical"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/textView_moonphase_value"
+        app:layout_constraintStart_toEndOf="@+id/textView_sunset"
+        tools:layout_editor_absoluteX="418dp"
+        tools:layout_editor_absoluteY="359dp" />
 
     <TextView
         android:id="@+id/textView_moonphase_value"
@@ -274,6 +279,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
         android:layout_marginStart="8dp"
+        android:gravity="right|center_vertical"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView_moonPhase"

@@ -64,6 +64,8 @@ public class MainActivity extends Activity {
         LocalBroadcastManager.getInstance(this).registerReceiver(m_pumpStateReceiver, new IntentFilter("teensy-event-pumpstate"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_heaterStateReceiver, new IntentFilter("teensy-event-heaterstate"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_helloReceiver, new IntentFilter("teensy-event-hello"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_settingsReceiver, new IntentFilter("settings-event"));
+
         m_settings = new Intent(this, SettingsActivity.class);
         m_webview = new Intent(this, WebviewActivity.class);
         m_lights = new Intent(this, LightsActivity.class);
@@ -90,26 +92,15 @@ public class MainActivity extends Activity {
         t.scheduleAtFixedRate(task, 0, 1000 * 60 * 24);
     }
 
-    public void startUIUpdateTimer(){
-        t = new Timer();
-        task = new TimerTask() {
-            TextView temp1 = (TextView)findViewById(R.id.textView_TempRightString);
-            TextView temp2 = (TextView)findViewById(R.id.textView_TempLeftString);
-            TextView level = (TextView)findViewById(R.id.textView_WaterLevel);
-
-            @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        level.setText("" + 0);
-                    }
-                });
-            }
-        };
-        t.scheduleAtFixedRate(task, 0, 1000 * 60);
-    }
+    private BroadcastReceiver m_settingsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            byte msg[] = intent.getByteArrayExtra("ACTION");
+            Log.d(TAG, "Settings is asking for: " + Arrays.toString(msg));
+            m_teensy.sendPreformattedMsg(msg);
+        }
+    };
 
     private BroadcastReceiver m_helloReceiver = new BroadcastReceiver() {
         @Override
@@ -174,9 +165,6 @@ public class MainActivity extends Activity {
     public void viewSettings(View view) {
         Log.d(TAG, "Viewing settings");
         setContentView(R.layout.activity_settings);
-
-        if (m_teensy.m_helloReceived)
-            m_teensy.requestWaterLevel();
 
         startActivity(m_settings);
     }

@@ -36,7 +36,6 @@ public class LightsActivity extends Activity {
         Calendar date = Calendar.getInstance();
         m_sun.setCurrentDate(date.get(date.YEAR), date.get(date.MONTH) + 1, date.get(date.DAY_OF_MONTH));
 
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent("teensy-event"));
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("lights-event"));
     }
 
