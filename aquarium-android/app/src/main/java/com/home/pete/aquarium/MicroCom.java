@@ -28,11 +28,6 @@ public class MicroCom {
         m_context = context;
         try {
             List<String> deviceList = m_manager.getUartDeviceList();
-            if (deviceList.isEmpty()) {
-                Log.i(TAG, "No device available.");
-            } else {
-                Log.i(TAG, "List of available devices: " + deviceList);
-            }
             m_device = m_manager.openUartDevice(DEV_NAME);
             m_device.registerUartDeviceCallback(mUartCallback);
             configureDevice();
@@ -150,13 +145,17 @@ public class MicroCom {
     }
 
     private void writeData(byte[] buf) throws IOException {
+        Log.d(TAG, "Sending: " + Arrays.toString(buf));
         m_device.write(buf, buf.length);
     }
 
     private void parseMessage(byte[] buf, int length) {
+        Log.d(TAG, "Got a message of size: " + length);
+        Log.d(TAG, "Message contents are: " + Arrays.toString(buf));
+
         if (((buf[0] & 0xFF) == 0xF0) && ((buf[length - 1] & 0xFF) == 0xF1)) {
 
-            switch ((buf[2] & 0xFF)) {
+            switch ((buf[3] & 0xFF)) {
                 case 0xAA: {
                     Log.d(TAG, "Init response received, we can talk to the Teensy");
                     m_helloReceived = true;
@@ -202,28 +201,16 @@ public class MicroCom {
         }
     }
 
-    private void readUartBuffer(UartDevice uart) throws IOException {
-        // Maximum amount of data to read at one time
-        final int maxCount = 32;
-        byte[] buf = new byte[maxCount];
-
-        int count;
-        count = uart.read(buf, buf.length);
-
-        if ((buf[0] & 0xFF) == 0xF0) {
-            parseMessage(buf, count);
-        }
-        else {
-            Log.e(TAG, "Unknown message starting with " + (buf[0] & 0xFF));
-        }
-    }
-
     private UartDeviceCallback mUartCallback = new UartDeviceCallback() {
         @Override
         public boolean onUartDeviceDataAvailable(UartDevice uart) {
             // Read available data from the UART device
             try {
-                readUartBuffer(uart);
+                byte[] buffer = new byte[24];
+                int count = uart.read(buffer, buffer.length);
+                if ((buffer[0] & 0xFF) == 0xF0) {
+                    parseMessage(buffer, count);
+                }
             }
             catch (IOException e) {
                 Log.w(TAG, "Unable to access UART device", e);

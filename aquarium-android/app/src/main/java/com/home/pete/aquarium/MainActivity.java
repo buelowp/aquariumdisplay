@@ -46,6 +46,7 @@ public class MainActivity extends Activity {
     private Intent m_webview;
     private Intent m_lights;
     private MicroCom m_teensy = new MicroCom(this);
+    private boolean m_uartConnected;
     private Sunposition m_sun = new Sunposition(LATITUDE, LONGITUDE, -5);
     Timer t;
     TimerTask task;
@@ -69,6 +70,7 @@ public class MainActivity extends Activity {
         m_settings = new Intent(this, SettingsActivity.class);
         m_webview = new Intent(this, WebviewActivity.class);
         m_lights = new Intent(this, LightsActivity.class);
+        m_uartConnected = false;
         m_teensy.sendHello();
         startDailyTimer();
     }
@@ -107,6 +109,9 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent)
         {
             int msg = intent.getIntExtra("ACTION", 0);
+            if (msg == 1) {
+                m_uartConnected = true;
+            }
             Log.d(TAG, "Got hello reponse of: " + msg);
         }
     };

@@ -1,6 +1,7 @@
 #include <FastLED.h>
 #include <DallasTemperature.h>
 #include <OneWire.h>
+#include "Message.h"
 
 #define SERIES_RESISTOR     748    // Value of the series resistor in ohms.    
 #define SENSOR_PIN          14      // Analog pin which is connected to the sensor. 
@@ -19,11 +20,23 @@ byte thingsMsg[128] = {};
 OneWire ds(TEMP_PIN);
 DallasTemperature sensors(&ds);
 CRGB leds[NUM_LEDS];
+int msgIndex;
+Message msgBuffer;
 
 typedef union {
   float f;
   byte b[4];
 } CVT;
+
+void printSerialMessage(byte *msg, int s)
+{
+  for (int i = 0; i < s; i++) {
+    Serial.print("0x");
+    Serial.print(msg[i], HEX);
+    Serial.print(",");
+  }
+  Serial.println("");
+}
 
 float resistanceToVolume(float resistance, float zeroResistance, float calResistance, float calVolume) 
 {
@@ -50,9 +63,7 @@ float readResistance(int pin, int seriesResistance)
 
 void replyHello()
 {
-  byte response[] = {0xF0, 0x01, 0xAA, 0xF1};
-  Serial1.write(response, 4);
-  Serial.println("Sending back Hello");
+  msgBuffer.hello();
 }
 
 void shutdownDevice()
@@ -85,49 +96,37 @@ void setLedBrightness(byte b[], int bytes)
     return;
     
   Serial.print("Request to set LED strip to brightness value ");
-  Serial.println(msg[0]);
-  FastLED.setBrightness(msg[0]);
+  Serial.println(b[0]);
+  FastLED.setBrightness(b[0]);
   FastLED.show();
 }
 
 void getWaterLevel()
 {
   CVT convert;
-  byte response[8];
   
   Serial.println("Rquest to check water level");
   float resistance = readResistance(SENSOR_PIN, SERIES_RESISTOR);
   convert.f = resistance;
-  response[0] = 0xF0;
-  response[1] = 0x04;
-  response[2] = 0x03;
-  for (int i = 0; i < 4; i++) {
-    response[i + 3] = convert.b[i];
-  }
-  response[7] = 0xF1;
-  Serial1.write(response, 8);
+
+  msgBuffer.setWaterLevel(convert.b, 4);
 }
 
 void getTemps()
 {
   CVT convertRight;
   CVT convertLeft;
-  byte response[12];
   
   Serial.println("Request to check water temperature");
   sensors.requestTemperatures();
   convertRight.f = sensors.getTempFByIndex(0);
   convertLeft.f = sensors.getTempFByIndex(1);
+  Serial.print("Left Temp = ");
+  Serial.println(convertLeft.f);
+  Serial.print("Right Temp = ");
+  Serial.println(convertRight.f);
 
-  response[0] = 0xF0;
-  response[1] = 0x08;
-  response[2] = 0x04;
-  for (int i = 0; i < 4; i++) {
-    response[3 + i] = convertRight.b[i];
-    response[7 + i] = convertLeft.b[i];
-  }
-  response[11] = 0xF1;
-  Serial1.write(response, 12);
+  msgBuffer.setTemps(convertLeft.b, 4, convertRight.b, 4);
 }
 
 void toggleUV(byte msg[], int bytes)
@@ -147,38 +146,17 @@ void toggleUV(byte msg[], int bytes)
 
 void getUVState()
 {
-  byte response[5];
-
-  response[0] = 0xF0;
-  response[1] = 0x01;
-  response[2] = 0x07;
-  response[3] = digitalRead(UV_PIN);
-  response[4] = 0xF1;
-  Serial1.write(response, 5);
+  msgBuffer.setUVState(digitalRead(UV_PIN));
 }
 
 void getPumpState()
 {
-  byte response[5];
-
-  response[0] = 0xF0;
-  response[1] = 0x01;
-  response[2] = 0x07;
-  response[3] = digitalRead(PUMP_PIN);
-  response[4] = 0xF1;
-  Serial1.write(response, 5);
+  msgBuffer.setPumpState(digitalRead(PUMP_PIN));
 }
 
 void getHeaterState()
 {
-  byte response[5];
-
-  response[0] = 0xF0;
-  response[1] = 0x01;
-  response[2] = 0x07;
-  response[3] = digitalRead(HEATER_PIN);
-  response[4] = 0xF1;
-  Serial1.write(response, 5);
+  msgBuffer.setHeaterState(digitalRead(HEATER_PIN));
 }
 
 void turnOffSunLights()
@@ -191,8 +169,20 @@ void turnOffSunLights()
 
 void toggleAllLights()
 {
+  byte msg[1] = { 0x00 };
+  
   turnOffSunLights();
-  toggleUV(0);
+  toggleUV(msg, 1);
+}
+
+void togglePumpState()
+{
+  
+}
+
+void toggleHeaterState()
+{
+  
 }
 
 void getSunLightState()
@@ -202,9 +192,9 @@ void getSunLightState()
   response[0] = 0xF0;
   response[1] = 0x01;
   response[2] = 0x0C;
-  if (leds[0] == CRGB::Black)
-    response[3] = 0x00;
-  else
+//  if (leds[0] == CRGB::Black)
+//    response[3] = 0x00;
+//  else
     response[3] = 0x01;
     
   response[4] = 0xF1;
@@ -213,29 +203,30 @@ void getSunLightState()
 
 void parseThingsMsg(byte msg[])
 {
-  int index = 0;
-  int j;
+  int index = 3;
   byte contents[128];
+  int numMessages = msg[2];
   
   if (msg[0] == 0xF0) {
-    for (int i = 0; i < msg[2]; i++) {
-      if (i == 0) {
-        index = 3;
-      }
-      else {
-        index = index + msg[index + 1]
-      }
-      Serial.print("Checking message at index: ");
-      Serial.println(index);
-      Serial.print("This message is sized: ");
-      Serial.println(msg[index + 1]);
-      Serial.print("The message is :");
-      Serial.println(msg[index]);
+    Serial.print("This message is sized: ");
+    Serial.println(msg[1]);
+    Serial.print("There are ");
+    Serial.print(numMessages);
+    Serial.println(" messages inside");
+    for (int i = 0; i < numMessages; i++) { 
+      int message = msg[index];
+      int msgSize = msg[index + 1];
+      index+=2;
 
-      for (j = 0; j < msg[index + 1] -1 ; j++) {
-        contents[j] = msg[index + j + 2];
+      Serial.print("Checking message at index: ");
+      Serial.print(index);
+      Serial.print(", message id ");
+      Serial.println(message, HEX);
+
+      for (int j = 0; j < msgSize; j++) {
+        contents[j] = msg[index + j];
       }
-      switch (msg[index]) {
+       switch (message) {
         case 0xAA:
           replyHello();
           break;
@@ -243,10 +234,10 @@ void parseThingsMsg(byte msg[])
           shutdownDevice();
           break;
         case 0x01:
-          setLedColor(contents, j);
+          setLedColor(contents, msgSize);
           break;
         case 0x02:
-          setLedBrightness(contents, j);
+          setLedBrightness(contents, msgSize);
           break;
         case 0x03:
           getWaterLevel();
@@ -255,7 +246,7 @@ void parseThingsMsg(byte msg[])
           getTemps();
           break;
         case 0x05:
-          toggleUV(contents, j);
+          toggleUV(contents, msgSize);
           break;
         case 0x06:
           restartProgram();
@@ -292,9 +283,11 @@ void parseThingsMsg(byte msg[])
               break;
             }
             Serial.print(msg[i], HEX);
-            Serial.print(" ");
+            Serial.print(",");
           }
-      }      
+          Serial.println("");
+      }
+      index += msgSize;
     }
   }
 }
@@ -307,34 +300,25 @@ void setup()
   digitalWrite(UV_PIN, 0);
   sensors.begin();
   FastLED.addLeds<APA102>(leds, NUM_LEDS);
+  msgIndex = 0;
 }
 
 void loop() 
 {
-  int i = 0;
-  
   while (Serial1.available()) {
     int data = Serial1.read();
-    if (i == 0 && data != 0xF0)
-      continue;
-      
-    if (data != -1) {
-      thingsMsg[i++] = (byte)data;
+    thingsMsg[msgIndex++] = (byte)data;
+    if (data == 0xF1) {
+      printSerialMessage(thingsMsg, msgIndex);
+      parseThingsMsg(thingsMsg);
+      msgIndex = 0;
     }
   }
-  if (i > 1) {
-    parseThingsMsg(thingsMsg);
+  if (msgBuffer.getSize() > 0) {
+    msgBuffer.makeFinal();
+    Serial1.write(msgBuffer.getBuffer(), msgBuffer.getSize();
   }
-//  float resistance = readResistance(SENSOR_PIN, SERIES_RESISTOR);
-//  Serial.print("Resistance: "); 
-//  Serial.print(resistance, 2);
-//  Serial.println(" ohms");
-  // Map resistance to volume.
-//  float volume = resistanceToVolume(resistance, ZERO_VOLUME_RESISTANCE, CALIBRATION_RESISTANCE, CALIBRATION_VOLUME);
-//  Serial.print("Calculated volume: ");
-//  Serial.println(volume, 5);
-  // Delay for a second.
-//  delay(1000);
+  msgBuffer.clear();
 }
 
 
