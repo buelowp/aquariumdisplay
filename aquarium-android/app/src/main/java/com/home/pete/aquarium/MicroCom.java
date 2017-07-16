@@ -7,6 +7,7 @@ import android.content.*;
 import android.support.v4.content.LocalBroadcastManager;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -40,7 +41,6 @@ public class MicroCom {
             Log.e(TAG, "Error starting UART device " + DEV_NAME + ": " + e.getMessage());
         }
 
-        LocalBroadcastManager.getInstance(m_context).sendBroadcast(new Intent("teensy-event"));
         m_helloReceived = false;
     }
 
@@ -146,23 +146,30 @@ public class MicroCom {
 
     private void parseMessage(byte[] buf, int length) {
         if (((buf[0] & 0xFF) == 0xF0) && ((buf[length - 1] & 0xFF) == 0xF1)) {
-            Intent msg = new Intent("teensy-event");
 
             switch ((buf[2] & 0xFF)) {
-                case 0xAA:
+                case 0xAA: {
                     Log.d(TAG, "Init response received, we can talk to the Teensy");
                     m_helloReceived = true;
+                    Intent msg = new Intent("teensy-event-hello");
+                    msg.putExtra("ACTION", 1);
+                    Log.d(TAG, "Got a handshake reponse");
+                    LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
                     break;
-                case 0x03:
+                }
+                case 0x03: {
                     byte[] f = new byte[4];
                     for (int i = 0; i < 4; i++) {
                         f[i] = buf[i + 3];
                     }
                     float response = ByteBuffer.wrap(f).order(ByteOrder.LITTLE_ENDIAN).getFloat();
-                    msg.putExtra("WATERLEVEL", response);
+                    Intent msg = new Intent("teensy-event-waterlevel");
+                    msg.putExtra("ACTION", response);
                     Log.d(TAG, "Received a water level from the Teensy of value " + response);
+                    LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
                     break;
-                case 0x04:
+                }
+                case 0x04: {
                     if ((buf[3] & 0xff) == 0x08) {
                         byte[] r = new byte[4];
                         byte[] l = new byte[4];
@@ -172,13 +179,17 @@ public class MicroCom {
                         }
                         float left = ByteBuffer.wrap(l).order(ByteOrder.LITTLE_ENDIAN).getFloat();
                         float right = ByteBuffer.wrap(r).order(ByteOrder.LITTLE_ENDIAN).getFloat();
-                        msg.putExtra("RIGHTTEMP", right);
-                        msg.putExtra("LEFTTEMP", left);
+                        Intent msgl = new Intent("teensy-event-temp-left");
+                        Intent msgr = new Intent("teensy-event-temp-right");
+                        msgl.putExtra("ACTION", left);
+                        msgr.putExtra("ACTION", right);
+                        Log.d(TAG, "Received temperatures from the Teensy");
+                        LocalBroadcastManager.getInstance(m_context).sendBroadcast(msgl);
+                        LocalBroadcastManager.getInstance(m_context).sendBroadcast(msgr);
                     }
-                    Log.d(TAG, "Received temperatures from the Teensy");
                     break;
+                }
             }
-            LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
         }
     }
 

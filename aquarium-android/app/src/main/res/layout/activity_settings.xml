@@ -223,12 +223,13 @@
         android:layout_height="32dp"
         android:layout_marginStart="68dp"
         android:layout_marginTop="32dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/textview_temp_left_string"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toggle_PumpState"
         tools:layout_editor_absoluteX="68dp"
-        tools:layout_editor_absoluteY="180dp"
-        tools:text="@string/textview_temp_left_string" />
+        tools:layout_editor_absoluteY="180dp" />
 
     <TextView
         android:id="@+id/textView_TempLeft"

@@ -11,6 +11,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -57,9 +58,12 @@ public class MainActivity extends Activity {
         Calendar date = Calendar.getInstance();
         m_sun.setCurrentDate(date.get(date.YEAR), date.get(date.MONTH) + 1, date.get(date.DAY_OF_MONTH));
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("teensy-event"));
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent("settings-update"));
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent("lights-update"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_tempLeftReceiver, new IntentFilter("teensy-event-temp-left"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_tempRightReceiver, new IntentFilter("teensy-event-temp-right"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_waterLevelReceiver, new IntentFilter("teensy-event-waterlevel"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_pumpStateReceiver, new IntentFilter("teensy-event-pumpstate"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_heaterStateReceiver, new IntentFilter("teensy-event-heaterstate"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_helloReceiver, new IntentFilter("teensy-event-hello"));
         m_settings = new Intent(this, SettingsActivity.class);
         m_webview = new Intent(this, WebviewActivity.class);
         m_lights = new Intent(this, LightsActivity.class);
@@ -107,16 +111,57 @@ public class MainActivity extends Activity {
         t.scheduleAtFixedRate(task, 0, 1000 * 60);
     }
 
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver m_helloReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            String commAction = intent.getStringExtra("ACTION");
-            Log.d(TAG, "Got action: " + commAction);
-            if (commAction == "5") {
-                m_teensy.toggleUV();
-                return;
-            }
+            int msg = intent.getIntExtra("ACTION", 0);
+            Log.d(TAG, "Got hello reponse of: " + msg);
+        }
+    };
+
+    private BroadcastReceiver m_tempLeftReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            float msg = intent.getFloatExtra("ACTION", (float)0.0);
+            Log.d(TAG, "Got left temp: " + msg);
+        }
+    };
+
+    private BroadcastReceiver m_tempRightReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            float msg = intent.getFloatExtra("ACTION", (float)0.0);
+            Log.d(TAG, "Got right temp: " + msg);
+        }
+    };
+
+    private BroadcastReceiver m_waterLevelReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            float msg = intent.getFloatExtra("ACTION", (float)0.0);
+            Log.d(TAG, "Got water level: " + msg);
+        }
+    };
+
+    private BroadcastReceiver m_pumpStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            int msg = intent.getIntExtra("ACTION", 0);
+            Log.d(TAG, "Got pump state: " + msg);
+        }
+    };
+
+    private BroadcastReceiver m_heaterStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            int msg = intent.getIntExtra("ACTION", 0);
+            Log.d(TAG, "Got heater state: " + msg);
         }
     };
 

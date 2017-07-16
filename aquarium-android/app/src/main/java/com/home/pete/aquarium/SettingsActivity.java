@@ -32,7 +32,6 @@ public class SettingsActivity extends Activity {
 
         m_gd = new GestureDetector(this, new SettingsActivity.MyGestureListener());
 
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent("teensy-event"));
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("settings-event"));
         getInitialStates();
     }

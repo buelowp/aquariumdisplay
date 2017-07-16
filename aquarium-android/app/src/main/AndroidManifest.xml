@@ -5,9 +5,7 @@
     <application>
         <uses-library android:name="com.google.android.things" />
 
-        <activity android:name=".MainActivity"
-            android:theme="@android:style/Theme.NoTitleBar"
-            >
+        <activity android:name=".MainActivity" android:theme="@android:style/Theme.NoTitleBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,5 +31,4 @@
             android:label="@string/title_activity_lightsview"
             android:theme="@android:style/Theme.NoTitleBar" />
     </application>
-
 </manifest>
