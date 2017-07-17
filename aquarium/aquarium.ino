@@ -63,7 +63,11 @@ float readResistance(int pin, int seriesResistance)
 
 void replyHello()
 {
-  msgBuffer.hello();
+  Message msg;
+  msg.hello();
+  msg.makeFinal();
+  msg.printBuffer();
+  Serial1.write(msg.getBuffer(), msg.getSize());
 }
 
 void shutdownDevice()
@@ -102,7 +106,8 @@ void setLedBrightness(byte b[], int bytes)
 }
 
 void getWaterLevel()
-{
+{/*
+  Message msg;
   CVT convert;
   
   Serial.println("Rquest to check water level");
@@ -110,10 +115,15 @@ void getWaterLevel()
   convert.f = resistance;
 
   msgBuffer.setWaterLevel(convert.b, 4);
+  msg.makeFinal();
+  msg.printBuffer();
+  Serial1.write(msg.getBuffer(), msg.getSize());
+  */
 }
 
 void getTemps()
 {
+  Message msg;
   CVT convertRight;
   CVT convertLeft;
   
@@ -121,12 +131,12 @@ void getTemps()
   sensors.requestTemperatures();
   convertRight.f = sensors.getTempFByIndex(0);
   convertLeft.f = sensors.getTempFByIndex(1);
-  Serial.print("Left Temp = ");
-  Serial.println(convertLeft.f);
-  Serial.print("Right Temp = ");
-  Serial.println(convertRight.f);
-
-  msgBuffer.setTemps(convertLeft.b, 4, convertRight.b, 4);
+  msg.setTemps(convertLeft.b, 4, convertRight.b, 4);
+  msg.makeFinal();
+  msg.printBuffer();
+  Serial1.write(msg.getBuffer(), msg.getSize());
+  Serial1.flush();
+  delay(100);
 }
 
 void toggleUV(byte msg[], int bytes)
@@ -146,17 +156,38 @@ void toggleUV(byte msg[], int bytes)
 
 void getUVState()
 {
-  msgBuffer.setUVState(digitalRead(UV_PIN));
+  Message msg;
+  Serial.println("Setting UV state");
+  msg.setUVState(digitalRead(UV_PIN));
+  msg.makeFinal();
+  msg.printBuffer();
+  Serial1.write(msg.getBuffer(), msg.getSize());
+  Serial1.flush();
+  delay(100);
 }
 
 void getPumpState()
 {
-  msgBuffer.setPumpState(digitalRead(PUMP_PIN));
+  Message msg;
+  Serial.println("Setting Pump state");
+  msg.setPumpState(digitalRead(PUMP_PIN));
+  msg.makeFinal();
+  msg.printBuffer();
+  Serial1.write(msg.getBuffer(), msg.getSize());
+  Serial1.flush();
+  delay(100);
 }
 
 void getHeaterState()
 {
-  msgBuffer.setHeaterState(digitalRead(HEATER_PIN));
+  Message msg;
+  Serial.println("Setting Heater state");
+  msg.setHeaterState(digitalRead(HEATER_PIN));
+  msg.makeFinal();
+  msg.printBuffer();
+  Serial1.write(msg.getBuffer(), msg.getSize());
+  Serial1.flush();
+  delay(100);
 }
 
 void turnOffSunLights()
@@ -187,6 +218,8 @@ void toggleHeaterState()
 
 void getSunLightState()
 {
+  Serial.println("Getting lights state");
+  /*
   byte response[5];
 
   response[0] = 0xF0;
@@ -199,6 +232,7 @@ void getSunLightState()
     
   response[4] = 0xF1;
   Serial1.write(response, 5);
+  */
 }
 
 void parseThingsMsg(byte msg[])
@@ -214,13 +248,13 @@ void parseThingsMsg(byte msg[])
     Serial.print(numMessages);
     Serial.println(" messages inside");
     for (int i = 0; i < numMessages; i++) { 
-      int message = msg[index];
-      int msgSize = msg[index + 1];
-      index+=2;
-
       Serial.print("Checking message at index: ");
       Serial.print(index);
-      Serial.print(", message id ");
+
+      int message = msg[index++];
+      int msgSize = msg[index++];
+
+      Serial.print(", message id 0x");
       Serial.println(message, HEX);
 
       for (int j = 0; j < msgSize; j++) {
@@ -314,11 +348,6 @@ void loop()
       msgIndex = 0;
     }
   }
-  if (msgBuffer.getSize() > 0) {
-    msgBuffer.makeFinal();
-    Serial1.write(msgBuffer.getBuffer(), msgBuffer.getSize();
-  }
-  msgBuffer.clear();
 }
 
 

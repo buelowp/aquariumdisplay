@@ -154,48 +154,88 @@ public class MicroCom {
         Log.d(TAG, "Message contents are: " + Arrays.toString(buf));
 
         if (((buf[0] & 0xFF) == 0xF0) && ((buf[length - 1] & 0xFF) == 0xF1)) {
+            int msgSize = buf[1];
+            int msgCount = buf[2];
+            int index = 3;
 
-            switch ((buf[3] & 0xFF)) {
-                case 0xAA: {
-                    Log.d(TAG, "Init response received, we can talk to the Teensy");
-                    m_helloReceived = true;
-                    Intent msg = new Intent("teensy-event-hello");
-                    msg.putExtra("ACTION", 1);
-                    Log.d(TAG, "Got a handshake reponse");
-                    LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
-                    break;
-                }
-                case 0x03: {
-                    byte[] f = new byte[4];
-                    for (int i = 0; i < 4; i++) {
-                        f[i] = buf[i + 3];
+            Log.d(TAG, "Got message of size " + msgSize + ", with " + msgCount + " messages inside");
+            Log.d(TAG, "Checking message id " + (buf[index] & 0xFF) + " at index " + index);
+            for (int i = 0; i < msgCount; i++) {
+                switch ((buf[index++] & 0xFF)) {
+                    case 0xAA: {
+                        Intent msg = new Intent("teensy-event-hello");
+                        msg.putExtra("ACTION", 1);
+                        Log.d(TAG, "Got a handshake reponse");
+                        LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
+                        index++;
+                        break;
                     }
-                    float response = ByteBuffer.wrap(f).order(ByteOrder.LITTLE_ENDIAN).getFloat();
-                    Intent msg = new Intent("teensy-event-waterlevel");
-                    msg.putExtra("ACTION", response);
-                    Log.d(TAG, "Received a water level from the Teensy of value " + response);
-                    LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
-                    break;
-                }
-                case 0x04: {
-                    if ((buf[3] & 0xff) == 0x08) {
-                        byte[] r = new byte[4];
-                        byte[] l = new byte[4];
-                        for (int i = 0; i < 4; i++) {
-                            r[i] = buf[i + 3];
-                            l[i] = buf[i + 7];
+                    case 0x03: {
+                        int packetSize = buf[index++];
+                        byte[] f = new byte[packetSize];
+                        for (int j = 0; j < packetSize; j++) {
+                            f[j] = buf[index + j];
                         }
-                        float left = ByteBuffer.wrap(l).order(ByteOrder.LITTLE_ENDIAN).getFloat();
-                        float right = ByteBuffer.wrap(r).order(ByteOrder.LITTLE_ENDIAN).getFloat();
-                        Intent msgl = new Intent("teensy-event-temp-left");
-                        Intent msgr = new Intent("teensy-event-temp-right");
-                        msgl.putExtra("ACTION", left);
-                        msgr.putExtra("ACTION", right);
-                        Log.d(TAG, "Received temperatures from the Teensy");
-                        LocalBroadcastManager.getInstance(m_context).sendBroadcast(msgl);
-                        LocalBroadcastManager.getInstance(m_context).sendBroadcast(msgr);
+                        index += packetSize;
+                        float response = ByteBuffer.wrap(f).order(ByteOrder.LITTLE_ENDIAN).getFloat();
+                        Intent msg = new Intent("teensy-event-waterlevel");
+                        msg.putExtra("ACTION", response);
+                        Log.d(TAG, "Received a water level from the Teensy of value " + response);
+                        LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
+                        break;
                     }
-                    break;
+                    case 0x04: {
+                        int packetSize = buf[index++];
+                        float left = 0;
+                        float right = 0;
+                        Log.d(TAG, "Got packetsize of " + packetSize + " and am at index " + index);
+                        try {
+                            byte[] l = Arrays.copyOfRange(buf, index, (index + 4));
+                            index += 4;
+                            byte[] r = Arrays.copyOfRange(buf, index, (index + 4));
+                            index += 4;
+                            left = ByteBuffer.wrap(l).order(ByteOrder.LITTLE_ENDIAN).getFloat();
+                            right = ByteBuffer.wrap(r).order(ByteOrder.LITTLE_ENDIAN).getFloat();
+                        }
+                        catch (ArrayIndexOutOfBoundsException | IllegalArgumentException | NullPointerException e) {
+                            Log.e(TAG, "Array copy exception: " + e.getMessage());
+                        }
+                        Log.d(TAG, "Got left temp " + left + " and right temp " + right);
+                        Intent msg_l = new Intent("teensy-event-temp-left");
+                        msg_l.putExtra("ACTION", left);
+                        Intent msg_r = new Intent("teensy-event-temp-right");
+                        msg_r.putExtra("ACTION", right);
+                        LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg_l);
+                        LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg_r);
+                        break;
+                    }
+                    case 0x07: {
+                        int packetSize = buf[index++];
+                        int state = buf[index++];
+                        Intent msg = new Intent("teensy-event-uvstate");
+                        msg.putExtra("ACTION", state);
+                        Log.d(TAG, "Got UV state of " + state);
+                        LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
+                        break;
+                    }
+                    case 0x08: {
+                        int packetSize = buf[index++];
+                        int state = buf[index++];
+                        Intent msg = new Intent("teensy-event-pumpstate");
+                        msg.putExtra("ACTION", state);
+                        Log.d(TAG, "Got a pump state of " + state);
+                        LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
+                        break;
+                    }
+                    case 0x09: {
+                        int packetSize = buf[index++];
+                        int state = buf[index++];
+                        Intent msg = new Intent("teensy-event-heaterstate");
+                        msg.putExtra("ACTION", state);
+                        Log.d(TAG, "Got a heater state of " + state);
+                        LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
+                        break;
+                    }
                 }
             }
         }
@@ -206,7 +246,7 @@ public class MicroCom {
         public boolean onUartDeviceDataAvailable(UartDevice uart) {
             // Read available data from the UART device
             try {
-                byte[] buffer = new byte[24];
+                byte[] buffer = new byte[256];
                 int count = uart.read(buffer, buffer.length);
                 if ((buffer[0] & 0xFF) == 0xF0) {
                     parseMessage(buffer, count);

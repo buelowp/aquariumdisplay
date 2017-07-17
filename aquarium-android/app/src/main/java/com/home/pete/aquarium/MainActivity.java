@@ -64,6 +64,7 @@ public class MainActivity extends Activity {
         LocalBroadcastManager.getInstance(this).registerReceiver(m_waterLevelReceiver, new IntentFilter("teensy-event-waterlevel"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_pumpStateReceiver, new IntentFilter("teensy-event-pumpstate"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_heaterStateReceiver, new IntentFilter("teensy-event-heaterstate"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_heaterStateReceiver, new IntentFilter("teensy-event-uvstate"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_helloReceiver, new IntentFilter("teensy-event-hello"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_settingsReceiver, new IntentFilter("settings-event"));
 
@@ -120,7 +121,10 @@ public class MainActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            float msg = intent.getFloatExtra("ACTION", (float)0.0);
+            float value = intent.getFloatExtra("ACTION", 0);
+            Intent msg = new Intent("left-temp");
+            msg.putExtra("ACTION", value);
+            LocalBroadcastManager.getInstance(context).sendBroadcast(msg);
             Log.d(TAG, "Got left temp: " + msg);
         }
     };
@@ -129,7 +133,10 @@ public class MainActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            float msg = intent.getFloatExtra("ACTION", (float)0.0);
+            float value = intent.getFloatExtra("ACTION", 0);
+            Intent msg = new Intent("right-temp");
+            msg.putExtra("ACTION", value);
+            LocalBroadcastManager.getInstance(context).sendBroadcast(msg);
             Log.d(TAG, "Got right temp: " + msg);
         }
     };
@@ -138,7 +145,10 @@ public class MainActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            float msg = intent.getFloatExtra("ACTION", (float)0.0);
+            float value = intent.getFloatExtra("ACTION", (float)0.0);
+            Intent msg = new Intent("water-level");
+            msg.putExtra("ACTION", value);
+            LocalBroadcastManager.getInstance(context).sendBroadcast(msg);
             Log.d(TAG, "Got water level: " + msg);
         }
     };
@@ -147,8 +157,16 @@ public class MainActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            int msg = intent.getIntExtra("ACTION", 0);
-            Log.d(TAG, "Got pump state: " + msg);
+            int value = intent.getIntExtra("ACTION", 0);
+            boolean state;
+            if (value != 0)
+                state = true;
+            else
+                state = false;
+            Intent msg = new Intent("pump-state");
+            msg.putExtra("ACTION", state);
+            Log.d(TAG, "Got pump state: " + value);
+            LocalBroadcastManager.getInstance(context).sendBroadcast(msg);
         }
     };
 
@@ -156,8 +174,16 @@ public class MainActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            int msg = intent.getIntExtra("ACTION", 0);
-            Log.d(TAG, "Got heater state: " + msg);
+            int value = intent.getIntExtra("ACTION", 0);
+            boolean state;
+            if (value != 0)
+                state = true;
+            else
+                state = false;
+            Intent msg = new Intent("heater-state");
+            msg.putExtra("ACTION", state);
+            Log.d(TAG, "Got heater state: " + value);
+            LocalBroadcastManager.getInstance(context).sendBroadcast(msg);
         }
     };
 

@@ -65,7 +65,11 @@ public class SettingsActivity extends Activity {
         m_waterChange = (Button)findViewById(R.id.button_ChangeWater);
         m_filterChange = (Button)findViewById(R.id.button_changeFilter);
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("settings-event"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_heaterStateMessage, new IntentFilter("heater-state"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_pumpStateMessage, new IntentFilter("pump-state"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_leftTempMessage, new IntentFilter("left-temp"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_rightTempMessage, new IntentFilter("right-temp"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_waterLevelMessage, new IntentFilter("water-level"));
         setCelestialBodies();
         getInitialData();
     }
@@ -81,7 +85,43 @@ public class SettingsActivity extends Activity {
         t.scheduleAtFixedRate(task, 0, 1000 * 60);
     }
 
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver m_heaterStateMessage = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            boolean value = intent.getBooleanExtra("ACTION", false);
+            m_heaterState.setChecked(value);
+        }
+    };
+
+    private BroadcastReceiver m_pumpStateMessage = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            boolean value = intent.getBooleanExtra("ACTION", false);
+            m_pumpState.setChecked(value);
+        }
+    };
+
+    private BroadcastReceiver m_leftTempMessage = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            float value = intent.getFloatExtra("ACTION", 0);
+            m_leftTemp.setText("" + value);
+        }
+    };
+
+    private BroadcastReceiver m_rightTempMessage = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            float value = intent.getFloatExtra("ACTION", 0);
+            m_rightTemp.setText("" + value);
+        }
+    };
+
+    private BroadcastReceiver m_waterLevelMessage = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent)
         {
@@ -117,7 +157,7 @@ public class SettingsActivity extends Activity {
         msg.getHeaterState();
         msg.getPumpState();
         msg.getTemps();
-        msg.getWaterLevel();
+//        msg.getWaterLevel();
         msg.makeFinal();
 
         Intent i = new Intent("settings-event");

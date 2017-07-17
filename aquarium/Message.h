@@ -17,6 +17,8 @@ public:
   void makeFinal();
   uint8_t* getBuffer();
   int getSize();
+  int hasContent();
+  bool isFinal();
   void printBuffer();
   void clear();
   void setUVState(uint8_t);
@@ -26,6 +28,7 @@ public:
 private:
   uint8_t m_internal[128];
   int m_currIndex;
+  bool m_isFinal;
 };
 
 #endif
