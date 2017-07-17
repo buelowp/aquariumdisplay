@@ -6,6 +6,7 @@ import android.app.Activity;
 import com.google.android.things.pio.*;
 import android.content.*;
 
+import android.os.Handler;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -27,6 +28,7 @@ public class SettingsActivity extends Activity {
     private static final double LONGITUDE = 87.984189;
     PeripheralManagerService service = new PeripheralManagerService();
 
+    private Handler handler = new Handler();
     private GestureDetector m_gd;
     private Timer t;
     private TimerTask task;
@@ -72,18 +74,18 @@ public class SettingsActivity extends Activity {
         LocalBroadcastManager.getInstance(this).registerReceiver(m_waterLevelMessage, new IntentFilter("water-level"));
         setCelestialBodies();
         getInitialData();
+
+        handler.postDelayed(finalizer, 1000 * 10);
     }
 
-    public void startUIUpdateTimer() {
-        t = new Timer();
-        task = new TimerTask() {
-
-            @Override
-            public void run() {
-            };
-        };
-        t.scheduleAtFixedRate(task, 0, 1000 * 60);
-    }
+    Runnable finalizer = new Runnable()
+    {
+        public void run()
+        {
+            Log.d(TAG, "Activity timed out");
+            finish();
+        }
+    };
 
     private BroadcastReceiver m_heaterStateMessage = new BroadcastReceiver() {
         @Override
@@ -157,7 +159,7 @@ public class SettingsActivity extends Activity {
         msg.getHeaterState();
         msg.getPumpState();
         msg.getTemps();
-//        msg.getWaterLevel();
+        msg.getWaterLevel();
         msg.makeFinal();
 
         Intent i = new Intent("settings-event");
@@ -177,6 +179,7 @@ public class SettingsActivity extends Activity {
 
     public void togglePump(View view)
     {
+        handler.removeCallbacks(finalizer);
         MessagePayload msg = new MessagePayload();
         msg.togglePumpState();
         msg.makeFinal();
@@ -184,10 +187,12 @@ public class SettingsActivity extends Activity {
         Intent i = new Intent("teensy-event");
         i.putExtra("ACTION", msg.getMessage());
         LocalBroadcastManager.getInstance(this).sendBroadcast(i);
+        handler.postDelayed(finalizer, 1000 * 10);
     }
 
     public void toggleHeater(View view)
     {
+        handler.removeCallbacks(finalizer);
         MessagePayload msg = new MessagePayload();
         msg.toggleHeaterState();
         msg.makeFinal();
@@ -195,10 +200,12 @@ public class SettingsActivity extends Activity {
         Intent i = new Intent("teensy-event");
         i.putExtra("ACTION", msg.getMessage());
         LocalBroadcastManager.getInstance(this).sendBroadcast(i);
+        handler.postDelayed(finalizer, 1000 * 10);
     }
 
     public void toggleSystem(View view)
     {
+        handler.removeCallbacks(finalizer);
         MessagePayload msg = new MessagePayload();
         msg.powerOffSystem();
         msg.makeFinal();
@@ -206,10 +213,14 @@ public class SettingsActivity extends Activity {
         Intent i = new Intent("teensy-event");
         i.putExtra("ACTION", msg.getMessage());
         LocalBroadcastManager.getInstance(this).sendBroadcast(i);
+        handler.postDelayed(finalizer, 1000 * 10);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        Log.d(TAG, "Handing a touch event");
+        handler.removeCallbacks(finalizer);
+        handler.postDelayed(finalizer, 1000 * 10);
         this.m_gd.onTouchEvent(event);
         return super.onTouchEvent(event);
     }
