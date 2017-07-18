@@ -168,6 +168,7 @@ public class MicroCom {
                         Log.d(TAG, "Got a handshake reponse");
                         LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
                         index++;
+                        m_helloReceived = true;
                         break;
                     }
                     case 0x03: {

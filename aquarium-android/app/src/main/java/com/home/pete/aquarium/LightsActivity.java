@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -19,6 +20,7 @@ public class LightsActivity extends Activity {
     private static final double LATITUDE = 42.058102;
     private static final double LONGITUDE = 87.984189;
 
+    private Handler handler = new Handler();
     private GestureDetector m_gd;
     private boolean m_uvEnabled;
     private boolean m_sunLightOn;
@@ -37,7 +39,17 @@ public class LightsActivity extends Activity {
         m_sun.setCurrentDate(date.get(date.YEAR), date.get(date.MONTH) + 1, date.get(date.DAY_OF_MONTH));
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("lights-event"));
+        handler.postDelayed(finalizer, 1000 * 10);
     }
+
+    Runnable finalizer = new Runnable()
+    {
+        public void run()
+        {
+            Log.d(TAG, "Activity timed out");
+            finish();
+        }
+    };
 
     public void toggleUV(View view) {
         MessagePayload msg = new MessagePayload();

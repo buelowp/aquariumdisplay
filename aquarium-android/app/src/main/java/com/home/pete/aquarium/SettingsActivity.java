@@ -78,6 +78,18 @@ public class SettingsActivity extends Activity {
         handler.postDelayed(finalizer, 1000 * 10);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop");
+    }
+
     Runnable finalizer = new Runnable()
     {
         public void run()
@@ -135,13 +147,12 @@ public class SettingsActivity extends Activity {
         Calendar date = Calendar.getInstance();
         double sunrise = m_sun.calcSunrise();
         double sunset = m_sun.calcSunset();
-        int moonphase = m_sun.moonPhase(date.getTimeInMillis());
         int sunriseHour = (int)sunrise / 60;
         int sunriseMin = (int)sunrise % 60;
         int sunsetHour = (int)sunset / 60;
         int sunsetMin = (int)sunset % 60;
 
-        m_moonphase.setText(String.valueOf(moonphase));
+        m_moonphase.setText(String.valueOf(m_sun.moonPhase()));
         m_sunrise.setText("" + sunriseHour + ":" + sunriseMin + " AM");
         m_sunset.setText("" + sunsetHour + ":" + sunsetMin + " PM");
 

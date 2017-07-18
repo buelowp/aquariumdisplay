@@ -31,4 +31,5 @@
             android:label="@string/title_activity_lightsview"
             android:theme="@android:style/Theme.NoTitleBar" />
     </application>
+    <uses-permission android:name="android.permission.SET_TIME_ZONE"/>
 </manifest>

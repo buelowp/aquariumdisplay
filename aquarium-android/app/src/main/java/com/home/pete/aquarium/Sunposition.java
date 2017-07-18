@@ -10,6 +10,9 @@ public class Sunposition {
     private double m_longitude;
     private int m_timeZone;
     private double m_julianDate;
+    private int m_year;
+    private int m_month;
+    private int m_day;
 
     public Sunposition()
     {
@@ -274,12 +277,52 @@ public class Sunposition {
     public double setCurrentDate(int y, int m, int d)
     {
         m_julianDate = calcJD(y, m, d);
+        m_year = y;
+        m_month = m;
+        m_day = d;
         return m_julianDate;
     }
 
     public void setTZOffset(int tz)
     {
         m_timeZone = tz;
+    }
+
+    private double GetFrac(double fr)
+    {
+        return (fr - Math.floor(fr));
+    }
+
+    public double moonPhase() {
+        double degToRad = 3.14159265 / 180;
+        double K0, T, T2, T3, J0, F0, M0, M1, B1;
+        double oldJ = 0.0;
+        K0 = Math.floor((m_year - 1900) * 12.3685);
+        T = (m_year - 1899.5) / 100;
+        T2 = T*T;
+        T3 = T*T*T;
+        J0 = 2415020 + 29*K0;
+        F0 = 0.0001178*T2 - 0.000000155*T3 + (0.75933 + 0.53058868*K0) - (0.000837*T + 0.000335*T2);
+        M0 = 360*(GetFrac(K0*0.08084821133)) + 359.2242 - 0.0000333*T2 - 0.00000347*T3;
+        M1 = 360*(GetFrac(K0*0.07171366128)) + 306.0253 + 0.0107306*T2 + 0.00001236*T3;
+        B1 = 360*(GetFrac(K0*0.08519585128)) + 21.2964 - (0.0016528*T2) - (0.00000239*T3);
+        int phase = 0;
+        double jday = 0;
+        while (jday < m_julianDate) {
+            double F = F0 + 1.530588*phase;
+            double M5 = (M0 + phase*29.10535608)*degToRad;
+            double M6 = (M1 + phase*385.81691806)*degToRad;
+            double B6 = (B1 + phase*390.67050646)*degToRad;
+            F -= 0.4068*Math.sin(M6) + (0.1734 - 0.000393*T)*Math.sin(M5);
+            F += 0.0161*Math.sin(2*M6) + 0.0104*Math.sin(2*B6);
+            F -= 0.0074*Math.sin(M5 - M6) - 0.0051*Math.sin(M5 + M6);
+            F += 0.0021*Math.sin(2*M5) + 0.0010*Math.sin(2*B6-M6);
+            F += 0.5 / 1440;
+            oldJ = jday;
+            jday = J0 + 28 * phase + Math.floor(F);
+            phase++;
+        }
+        return ((m_julianDate - oldJ) % 30);
     }
 
     public int moonPhase(long fromepoch)

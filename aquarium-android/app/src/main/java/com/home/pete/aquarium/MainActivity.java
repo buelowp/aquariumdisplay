@@ -1,6 +1,7 @@
 package com.home.pete.aquarium;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -72,8 +73,22 @@ public class MainActivity extends Activity {
         m_webview = new Intent(this, WebviewActivity.class);
         m_lights = new Intent(this, LightsActivity.class);
         m_uartConnected = false;
-        m_teensy.sendHello();
+
         startDailyTimer();
+        if (!m_teensy.m_helloReceived)
+            m_teensy.sendHello();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop");
     }
 
     public void startDailyTimer() {
@@ -196,7 +211,6 @@ public class MainActivity extends Activity {
     public void viewSettings(View view) {
         Log.d(TAG, "Viewing settings");
         setContentView(R.layout.activity_settings);
-
         startActivity(m_settings);
     }
 
