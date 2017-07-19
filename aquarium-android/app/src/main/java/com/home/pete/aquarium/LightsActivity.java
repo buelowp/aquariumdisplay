@@ -39,7 +39,27 @@ public class LightsActivity extends Activity {
         m_sun.setCurrentDate(date.get(date.YEAR), date.get(date.MONTH) + 1, date.get(date.DAY_OF_MONTH));
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("lights-event"));
+
         handler.postDelayed(finalizer, 1000 * 10);
+        Log.d(TAG, "onCreate()");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy");
     }
 
     Runnable finalizer = new Runnable()
@@ -155,10 +175,7 @@ public class LightsActivity extends Activity {
                                float velocityX, float velocityY) {
 
             if(event2.getX() > event1.getX()){
-                //switch another activity
-                Intent intent = new Intent(
-                        LightsActivity.this, MainActivity.class);
-                startActivity(intent);
+                finish();
             }
 
             return true;

@@ -38,27 +38,17 @@ import java.util.TimerTask;
  */
 public class MainActivity extends Activity {
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final double LATITUDE = 42.058102;
-    private static final double LONGITUDE = 87.984189;
-    public static final String BROADCAST_FILTER = "ManageConection_broadcast_receiver_intent_filter";
-    PeripheralManagerService service = new PeripheralManagerService();
 
     private Intent m_settings;
     private Intent m_webview;
     private Intent m_lights;
     private MicroCom m_teensy = new MicroCom(this);
-    private boolean m_uartConnected;
-    private Sunposition m_sun = new Sunposition(LATITUDE, LONGITUDE, -5);
-    Timer t;
-    TimerTask task;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Calendar date = Calendar.getInstance();
-        m_sun.setCurrentDate(date.get(date.YEAR), date.get(date.MONTH) + 1, date.get(date.DAY_OF_MONTH));
+        Log.d(TAG, "onCreate()");
 
         LocalBroadcastManager.getInstance(this).registerReceiver(m_tempLeftReceiver, new IntentFilter("teensy-event-temp-left"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_tempRightReceiver, new IntentFilter("teensy-event-temp-right"));
@@ -72,9 +62,7 @@ public class MainActivity extends Activity {
         m_settings = new Intent(this, SettingsActivity.class);
         m_webview = new Intent(this, WebviewActivity.class);
         m_lights = new Intent(this, LightsActivity.class);
-        m_uartConnected = false;
 
-        startDailyTimer();
         if (!m_teensy.m_helloReceived)
             m_teensy.sendHello();
     }
@@ -91,23 +79,10 @@ public class MainActivity extends Activity {
         Log.d(TAG, "onStop");
     }
 
-    public void startDailyTimer() {
-        t = new Timer();
-        task = new TimerTask() {
-            Calendar date = Calendar.getInstance();
-
-            @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        m_sun.setCurrentDate(date.get(date.YEAR), date.get(date.MONTH) + 1, date.get(date.DAY_OF_MONTH));
-                    }
-                });
-            }
-        };
-        t.scheduleAtFixedRate(task, 0, 1000 * 60 * 24);
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy");
     }
 
     private BroadcastReceiver m_settingsReceiver = new BroadcastReceiver() {
@@ -125,9 +100,6 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent)
         {
             int msg = intent.getIntExtra("ACTION", 0);
-            if (msg == 1) {
-                m_uartConnected = true;
-            }
             Log.d(TAG, "Got hello reponse of: " + msg);
         }
     };
@@ -204,19 +176,16 @@ public class MainActivity extends Activity {
 
     public void viewFish(View view) {
         Log.d(TAG, "Viewing my fish");
-        setContentView(R.layout.activity_webview);
         startActivity(m_webview);
     }
 
     public void viewSettings(View view) {
         Log.d(TAG, "Viewing settings");
-        setContentView(R.layout.activity_settings);
         startActivity(m_settings);
     }
 
     public void viewLights(View view) {
         Log.d(TAG, "Managing the lights");
-        setContentView(R.layout.activity_lights);
         startActivity(m_lights);
     }
 }

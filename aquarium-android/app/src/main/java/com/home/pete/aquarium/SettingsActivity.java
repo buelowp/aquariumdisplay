@@ -243,9 +243,7 @@ public class SettingsActivity extends Activity {
 
             if(event2.getX() > event1.getX()){
                 //switch another activity
-                Intent intent = new Intent(
-                        SettingsActivity.this, MainActivity.class);
-                startActivity(intent);
+                finish();
             }
 
             return true;
