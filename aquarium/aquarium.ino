@@ -22,6 +22,8 @@ DallasTemperature sensors(&ds);
 CRGB leds[NUM_LEDS];
 int msgIndex;
 Message msgBuffer;
+elapsedMillis g_toggle;
+uint8_t g_brightness;
 
 typedef union {
   float f;
@@ -68,6 +70,8 @@ void replyHello()
   msg.makeFinal();
   msg.printBuffer();
   Serial1.write(msg.getBuffer(), msg.getSize());
+  Serial.flush();
+  delay(100);
 }
 
 void shutdownDevice()
@@ -106,7 +110,7 @@ void setLedBrightness(byte b[], int bytes)
 }
 
 void getWaterLevel()
-{/*
+{
   Message msg;
   CVT convert;
   
@@ -118,7 +122,8 @@ void getWaterLevel()
   msg.makeFinal();
   msg.printBuffer();
   Serial1.write(msg.getBuffer(), msg.getSize());
-  */
+  Serial1.flush();
+  delay(100);
 }
 
 void getTemps()
@@ -139,26 +144,31 @@ void getTemps()
   delay(100);
 }
 
-void toggleUV(byte msg[], int bytes)
+void toggleUV()
 {
-  if (bytes > 1)
-    return;
-    
-  if (msg[0] == 0x01) {
-    Serial.println("Turning on UV lights");
-    digitalWrite(UV_PIN, 1);
-  }
-  else {
-    Serial.println("Turning off UV lights");
-    digitalWrite(UV_PIN, 0);
-  }
+  digitalWrite(UV_PIN, !digitalRead(UV_PIN));
+  Serial.print("Setting UV to state ");
+  Serial.println(digitalRead(UV_PIN));
+  getUVState();
 }
 
 void getUVState()
 {
   Message msg;
-  Serial.println("Setting UV state");
-  msg.setUVState(digitalRead(UV_PIN));
+  Serial.println("Getting UV state");
+  msg.setUVState(!digitalRead(UV_PIN));
+  msg.makeFinal();
+  msg.printBuffer();
+  Serial1.write(msg.getBuffer(), msg.getSize());
+  Serial1.flush();
+  delay(100);
+}
+
+void getLightBrightness()
+{
+  Message msg;
+  Serial.println("Getting Brightness");
+  msg.setLEDBrightness(g_brightness);
   msg.makeFinal();
   msg.printBuffer();
   Serial1.write(msg.getBuffer(), msg.getSize());
@@ -200,39 +210,18 @@ void turnOffSunLights()
 
 void toggleAllLights()
 {
-  byte msg[1] = { 0x00 };
-  
   turnOffSunLights();
-  toggleUV(msg, 1);
+  toggleUV();
 }
 
 void togglePumpState()
 {
-  
+  digitalWrite(PUMP_PIN, !digitalRead(PUMP_PIN));
 }
 
 void toggleHeaterState()
 {
-  
-}
-
-void getSunLightState()
-{
-  Serial.println("Getting lights state");
-  /*
-  byte response[5];
-
-  response[0] = 0xF0;
-  response[1] = 0x01;
-  response[2] = 0x0C;
-//  if (leds[0] == CRGB::Black)
-//    response[3] = 0x00;
-//  else
-    response[3] = 0x01;
-    
-  response[4] = 0xF1;
-  Serial1.write(response, 5);
-  */
+  digitalWrite(HEATER_PIN, !digitalRead(HEATER_PIN));  
 }
 
 void parseThingsMsg(byte msg[])
@@ -280,7 +269,7 @@ void parseThingsMsg(byte msg[])
           getTemps();
           break;
         case 0x05:
-          toggleUV(contents, msgSize);
+          toggleUV();
           break;
         case 0x06:
           restartProgram();
@@ -301,7 +290,7 @@ void parseThingsMsg(byte msg[])
           toggleAllLights();
           break;
         case 0x0C:
-          getSunLightState();
+          getLightBrightness();
           break;
         case 0x0D:
           togglePumpState();
@@ -331,10 +320,13 @@ void setup()
   Serial.begin(115200);
   Serial1.begin(115200);
   pinMode(UV_PIN, OUTPUT);
-  digitalWrite(UV_PIN, 0);
+  pinMode(7, OUTPUT);
+  digitalWrite(7, 1);
+  digitalWrite(UV_PIN, 1);
   sensors.begin();
   FastLED.addLeds<APA102>(leds, NUM_LEDS);
   msgIndex = 0;
+  g_brightness = 250;
 }
 
 void loop() 
@@ -347,6 +339,10 @@ void loop()
       parseThingsMsg(thingsMsg);
       msgIndex = 0;
     }
+  }
+  if (g_toggle > 1000) {
+    digitalWrite(7, !digitalRead(7));
+    g_toggle = 0;
   }
 }
 

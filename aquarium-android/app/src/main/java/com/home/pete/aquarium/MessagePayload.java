@@ -163,6 +163,24 @@ public class MessagePayload {
         Log.d(TAG, "Finalized contents: " + Arrays.toString(getMessage()));
     }
 
+    public void getUVState()
+    {
+        m_internal[m_currIndex++] = (byte)0x07;
+        m_internal[m_currIndex++] = (byte)0x00;
+        m_internal[m_messageCount] += (byte)0x01;
+        m_internal[m_messageSize] += (byte)0x02;
+        m_currentMessageSize += 2;
+    }
+
+    public void getBrightness()
+    {
+        m_internal[m_currIndex++] = (byte)0x0C;
+        m_internal[m_currIndex++] = (byte)0x00;
+        m_internal[m_messageCount] += (byte)0x01;
+        m_internal[m_messageSize] += (byte)0x02;
+        m_currentMessageSize += 2;
+    }
+
     public byte[] getMessage()
     {
         byte msg[] = new byte[m_currentMessageSize];

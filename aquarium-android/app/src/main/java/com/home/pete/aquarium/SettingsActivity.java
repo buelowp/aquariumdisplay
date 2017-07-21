@@ -26,6 +26,7 @@ public class SettingsActivity extends Activity {
     private static final String TAG = SettingsActivity.class.getSimpleName();
     private static final double LATITUDE = 42.058102;
     private static final double LONGITUDE = 87.984189;
+    private static final int VIEW_TIMEOUT = 1000 * 60;
     PeripheralManagerService service = new PeripheralManagerService();
 
     private Handler handler = new Handler();
@@ -75,7 +76,7 @@ public class SettingsActivity extends Activity {
         setCelestialBodies();
         getInitialData();
 
-        handler.postDelayed(finalizer, 1000 * 10);
+        handler.postDelayed(finalizer, VIEW_TIMEOUT);
     }
 
     @Override
@@ -198,7 +199,7 @@ public class SettingsActivity extends Activity {
         Intent i = new Intent("teensy-event");
         i.putExtra("ACTION", msg.getMessage());
         LocalBroadcastManager.getInstance(this).sendBroadcast(i);
-        handler.postDelayed(finalizer, 1000 * 10);
+        handler.postDelayed(finalizer, VIEW_TIMEOUT);
     }
 
     public void toggleHeater(View view)
@@ -211,7 +212,7 @@ public class SettingsActivity extends Activity {
         Intent i = new Intent("teensy-event");
         i.putExtra("ACTION", msg.getMessage());
         LocalBroadcastManager.getInstance(this).sendBroadcast(i);
-        handler.postDelayed(finalizer, 1000 * 10);
+        handler.postDelayed(finalizer, VIEW_TIMEOUT);
     }
 
     public void toggleSystem(View view)
@@ -224,14 +225,14 @@ public class SettingsActivity extends Activity {
         Intent i = new Intent("teensy-event");
         i.putExtra("ACTION", msg.getMessage());
         LocalBroadcastManager.getInstance(this).sendBroadcast(i);
-        handler.postDelayed(finalizer, 1000 * 10);
+        handler.postDelayed(finalizer, VIEW_TIMEOUT);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         Log.d(TAG, "Handing a touch event");
         handler.removeCallbacks(finalizer);
-        handler.postDelayed(finalizer, 1000 * 10);
+        handler.postDelayed(finalizer, VIEW_TIMEOUT);
         this.m_gd.onTouchEvent(event);
         return super.onTouchEvent(event);
     }

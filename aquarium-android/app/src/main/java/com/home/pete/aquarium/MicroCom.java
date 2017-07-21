@@ -237,6 +237,15 @@ public class MicroCom {
                         LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
                         break;
                     }
+                    case 0x0C: {
+                        int packetSize = buf[index++];
+                        int state = buf[index++] & 0xFF;
+                        Intent msg = new Intent("teensy-event-brightness");
+                        msg.putExtra("ACTION", state);
+                        Log.d(TAG, "Got an LED brightness of " + state);
+                        LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
+                        break;
+                    }
                 }
             }
         }

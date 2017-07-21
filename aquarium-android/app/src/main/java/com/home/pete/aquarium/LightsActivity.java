@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.SeekBar;
+import android.widget.ToggleButton;
 
 import java.util.Calendar;
 
@@ -19,31 +21,47 @@ public class LightsActivity extends Activity {
     private static final String TAG = LightsActivity.class.getSimpleName();
     private static final double LATITUDE = 42.058102;
     private static final double LONGITUDE = 87.984189;
+    private static final int VIEW_TIMEOUT = 1000 * 60;
 
     private Handler handler = new Handler();
     private GestureDetector m_gd;
-    private boolean m_uvEnabled;
-    private boolean m_sunLightOn;
     private Sunposition m_sun = new Sunposition(LATITUDE, LONGITUDE, -5);
+
+    private ToggleButton tbUVState;
+    private SeekBar m_sbBrightness;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lights);
 
-        m_uvEnabled = false;
-        m_sunLightOn = false;
         m_gd = new GestureDetector(this, new LightsActivity.MyGestureListener());
 
         Calendar date = Calendar.getInstance();
         m_sun.setCurrentDate(date.get(date.YEAR), date.get(date.MONTH) + 1, date.get(date.DAY_OF_MONTH));
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("lights-event"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_uvStateReceiver, new IntentFilter("uv-state"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_ledBrightnessReceiver, new IntentFilter("led-brightness"));
+        tbUVState = (ToggleButton)findViewById(R.id.toggleButton_UVLights);
+        m_sbBrightness = (SeekBar)findViewById(R.id.seekBar_brightness);
+        m_sbBrightness.setMax(255);
 
-        handler.postDelayed(finalizer, 1000 * 10);
+        getInitialData();
+        handler.postDelayed(finalizer, VIEW_TIMEOUT);
         Log.d(TAG, "onCreate()");
     }
 
+    private void getInitialData() {
+        MessagePayload msg = new MessagePayload();
+        msg.getUVState();
+        msg.getBrightness();
+        msg.makeFinal();
+
+        Intent i = new Intent("teensy-event");
+        i.putExtra("ACTION", msg.getMessage());
+        LocalBroadcastManager.getInstance(this).sendBroadcast(i);
+
+    }
     @Override
     protected void onStart() {
         super.onStart();
@@ -72,6 +90,7 @@ public class LightsActivity extends Activity {
     };
 
     public void toggleUV(View view) {
+        handler.removeCallbacks(finalizer);
         MessagePayload msg = new MessagePayload();
         msg.toggleUVState();
         msg.makeFinal();
@@ -79,6 +98,7 @@ public class LightsActivity extends Activity {
         Intent i = new Intent("teensy-event");
         i.putExtra("ACTION", msg.getMessage());
         LocalBroadcastManager.getInstance(this).sendBroadcast(i);
+        handler.postDelayed(finalizer, VIEW_TIMEOUT);
     }
 
     public void toggleSunLights(View view) {
@@ -154,10 +174,27 @@ public class LightsActivity extends Activity {
         LocalBroadcastManager.getInstance(this).sendBroadcast(i);
     }
 
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver m_ledBrightnessReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent)
         {
+            int value = intent.getIntExtra("ACTION", 0);
+            Log.d(TAG, "LEDs are set to a brightness of " + value);
+            m_sbBrightness.setProgress((int)value);
+        }
+    };
+
+    private BroadcastReceiver m_uvStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            int value = intent.getIntExtra("ACTION", 0);
+            Log.d(TAG, "Got a uv state of " + value);
+            if (value != 0) {
+                tbUVState.setChecked(true);
+            }
+            else
+                tbUVState.setChecked(false);
         }
     };
 

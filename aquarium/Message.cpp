@@ -129,3 +129,13 @@ void Message::setHeaterState(uint8_t state)
   m_internal[INDEX_MSG_SIZE] += 3;
 }
 
+void Message::setLEDBrightness(uint8_t value)
+{
+  m_internal[m_currIndex++] = 12;
+  m_internal[m_currIndex++] = 1;
+  m_internal[m_currIndex++] = value;
+  m_internal[INDEX_MSG_COUNT] += 1;
+  m_internal[INDEX_MSG_SIZE] += 3;
+
+}
+

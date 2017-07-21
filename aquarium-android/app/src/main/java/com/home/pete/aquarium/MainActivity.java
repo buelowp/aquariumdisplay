@@ -55,9 +55,11 @@ public class MainActivity extends Activity {
         LocalBroadcastManager.getInstance(this).registerReceiver(m_waterLevelReceiver, new IntentFilter("teensy-event-waterlevel"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_pumpStateReceiver, new IntentFilter("teensy-event-pumpstate"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_heaterStateReceiver, new IntentFilter("teensy-event-heaterstate"));
-        LocalBroadcastManager.getInstance(this).registerReceiver(m_heaterStateReceiver, new IntentFilter("teensy-event-uvstate"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_toggleUVStateReceiver, new IntentFilter("teensy-event-uvstate"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_helloReceiver, new IntentFilter("teensy-event-hello"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_settingsReceiver, new IntentFilter("settings-event"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_teensyReceiver, new IntentFilter("teensy-event"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_brightnessReceiver, new IntentFilter("teensy-event-brightness"));
 
         m_settings = new Intent(this, SettingsActivity.class);
         m_webview = new Intent(this, WebviewActivity.class);
@@ -84,6 +86,16 @@ public class MainActivity extends Activity {
         super.onDestroy();
         Log.d(TAG, "onDestroy");
     }
+
+    private BroadcastReceiver m_teensyReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            byte msg[] = intent.getByteArrayExtra("ACTION");
+            Log.d(TAG, "Lights is asking for: " + Arrays.toString(msg));
+            m_teensy.sendPreformattedMsg(msg);
+        }
+    };
 
     private BroadcastReceiver m_settingsReceiver = new BroadcastReceiver() {
         @Override
@@ -167,9 +179,33 @@ public class MainActivity extends Activity {
                 state = true;
             else
                 state = false;
-            Intent msg = new Intent("heater-state");
+            Intent msg = new Intent("pump-state");
             msg.putExtra("ACTION", state);
-            Log.d(TAG, "Got heater state: " + value);
+            Log.d(TAG, "Got pump state: " + value);
+            LocalBroadcastManager.getInstance(context).sendBroadcast(msg);
+        }
+    };
+
+    private BroadcastReceiver m_toggleUVStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            int value = intent.getIntExtra("ACTION", 0);
+            Log.d(TAG, "Toggling UV state");
+            Intent msg = new Intent("uv-state");
+            msg.putExtra("ACTION", value);
+            LocalBroadcastManager.getInstance(context).sendBroadcast(msg);
+        }
+    };
+
+    private BroadcastReceiver m_brightnessReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            int value = intent.getIntExtra("ACTION", 0);
+            Log.d(TAG, "Updating LED brightness");
+            Intent msg = new Intent("led-brightness");
+            msg.putExtra("ACTION", value);
             LocalBroadcastManager.getInstance(context).sendBroadcast(msg);
         }
     };

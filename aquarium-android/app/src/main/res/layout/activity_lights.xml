@@ -20,9 +20,10 @@
     <ToggleButton
         android:id="@+id/toggleButton_UVLights"
         android:layout_width="150dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_marginStart="52dp"
         android:layout_marginTop="16dp"
+        android:onClick="toggleUV"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView_UVLights"
         tools:layout_editor_absoluteX="16dp"
@@ -31,7 +32,7 @@
     <ToggleButton
         android:id="@+id/toggleButton_dayLights"
         android:layout_width="150dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
         app:layout_constraintStart_toEndOf="@+id/toggleButton_UVLights"
@@ -106,7 +107,7 @@
     <ToggleButton
         android:id="@+id/toggleButton_allLights"
         android:layout_width="150dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
         app:layout_constraintStart_toEndOf="@+id/toggleButton_dayLights"
@@ -117,44 +118,52 @@
     <Button
         android:id="@+id/button_brightSun"
         android:layout_width="150dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_marginStart="52dp"
+        android:layout_marginTop="32dp"
         android:onClick="setToBrightSunlight"
         android:text="@string/button_title_brightsun"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toggleButton_UVLights"
         tools:layout_editor_absoluteX="115dp"
         tools:layout_editor_absoluteY="191dp" />
 
     <Button
         android:id="@+id/button_cloudy"
         android:layout_width="150dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
         android:onClick="setToCloudyLight"
         android:text="@string/button_title_cloudy"
         app:layout_constraintStart_toEndOf="@+id/button_brightSun"
+        app:layout_constraintTop_toBottomOf="@+id/toggleButton_dayLights"
         tools:layout_editor_absoluteX="255dp"
         tools:layout_editor_absoluteY="191dp" />
 
     <Button
         android:id="@+id/button_moonlight"
         android:layout_width="150dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
         android:onClick="setToMoonLight"
         android:text="@string/button_title_moon"
         app:layout_constraintStart_toEndOf="@+id/button_cloudy"
+        app:layout_constraintTop_toBottomOf="@+id/toggleButton_allLights"
         tools:layout_editor_absoluteX="441dp"
         tools:layout_editor_absoluteY="191dp" />
 
     <Button
         android:id="@+id/button_sunset"
         android:layout_width="150dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
         android:onClick="setToSunset"
         android:text="@string/button_title_sunset"
         app:layout_constraintStart_toEndOf="@+id/button_moonlight"
+        app:layout_constraintTop_toBottomOf="@+id/button_reset"
         tools:layout_editor_absoluteX="657dp"
         tools:layout_editor_absoluteY="191dp" />
 
@@ -176,7 +185,7 @@
     <Button
         android:id="@+id/button_reset"
         android:layout_width="150dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
         android:onClick="restartLightProgram"
