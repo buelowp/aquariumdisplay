@@ -24,6 +24,7 @@ int msgIndex;
 Message msgBuffer;
 elapsedMillis g_toggle;
 uint8_t g_brightness;
+bool g_lights;
 
 typedef union {
   float f;
@@ -166,6 +167,18 @@ void getUVState()
   delay(100);
 }
 
+void getSunlightState()
+{
+  Message msg;
+  Serial.println("Getting Sunlight state");
+  msg.setPrimaryLightState(g_lights);
+  msg.makeFinal();
+  msg.printBuffer();
+  Serial1.write(msg.getBuffer(), msg.getSize());
+  Serial1.flush();
+  delay(100);
+}
+
 void getLightBrightness()
 {
   Message msg;
@@ -202,18 +215,25 @@ void getHeaterState()
   delay(100);
 }
 
-void turnOffSunLights()
+void toggleSunLights()
 {
-  for (int i = 0; i < NUM_LEDS; i++) {
-    leds[i] = CRGB::Black;
+  if (g_lights) {
+    for (int i = 0; i < NUM_LEDS; i++) {
+      leds[i] = CRGB::Black;
+    }
+    FastLED.show();
+    g_lights = false;
   }
-  FastLED.show();
 }
 
 void toggleAllLights()
 {
-  turnOffSunLights();
+  Serial.println("Togging all lights");
+  toggleSunLights();
   toggleUV();
+  getUVState();
+  getLightBrightness();
+  getSunlightState();
 }
 
 void togglePumpState()
@@ -286,7 +306,7 @@ void parseThingsMsg(byte msg[])
           getHeaterState();
           break;
         case 0x0A:
-          turnOffSunLights();
+          toggleSunLights();
           break;
         case 0x0B:
           toggleAllLights();
@@ -299,6 +319,9 @@ void parseThingsMsg(byte msg[])
           break;
         case 0x0E:
           toggleHeaterState();
+          break;
+        case 0x0F:
+          getSunlightState();
           break;
         default:
           Serial.println("Unknown message");
@@ -330,6 +353,7 @@ void setup()
   FastLED.addLeds<APA102>(leds, NUM_LEDS);
   msgIndex = 0;
   g_brightness = 250;
+  g_lights = false;
 }
 
 void loop() 

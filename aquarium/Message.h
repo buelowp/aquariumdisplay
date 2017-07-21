@@ -25,6 +25,7 @@ public:
   void setPumpState(uint8_t);
   void setHeaterState(uint8_t);
   void setLEDBrightness(uint8_t);
+  void setPrimaryLightState(uint8_t);
 
 private:
   uint8_t m_internal[128];

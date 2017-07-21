@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Aquarium</string>
-    <string name="title_activity_webview">See the Fish</string>
-    <string name="title_activity_settings">Manage Settings</string>
-    <string name="title_activity_lightsview">Manage the Lights</string>
+    <string name="title_activity_webview">Meet The Fish</string>
+    <string name="title_activity_settings">Manage The Tank</string>
+    <string name="title_activity_lightsview">Manage The Lights</string>
     <string name="button_title_moon">Moon Light</string>
     <string name="button_title_sunset">Sunset</string>
     <string name="button_title_brightsun">Bright Sun</string>

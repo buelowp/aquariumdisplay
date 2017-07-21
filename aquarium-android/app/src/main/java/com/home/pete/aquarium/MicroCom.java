@@ -20,11 +20,13 @@ public class MicroCom {
 
     private UartDevice m_device;
     private Context m_context;
+    public boolean m_helloReceived;
 
     MicroCom(Context context)
     {
         PeripheralManagerService m_manager = new PeripheralManagerService();
         m_context = context;
+        m_helloReceived = false;
         try {
             m_device = m_manager.openUartDevice(DEV_NAME);
             m_device.registerUartDeviceCallback(mUartCallback);
@@ -161,6 +163,7 @@ public class MicroCom {
                         Log.d(TAG, "Got a handshake reponse");
                         LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
                         index++;
+                        m_helloReceived = true;
                         break;
                     }
                     case 0x03: {
@@ -240,6 +243,15 @@ public class MicroCom {
                         Intent msg = new Intent("teensy-event-brightness");
                         msg.putExtra("ACTION", state);
                         Log.d(TAG, "Got an LED brightness of " + state);
+                        LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
+                        break;
+                    }
+                    case 0x0A: {
+                        index++;
+                        boolean state = !((buf[index++] & 0xFF) == 0);
+                        Intent msg = new Intent("teensy-event-primary-light-state");
+                        msg.putExtra("ACTION", state);
+                        Log.d(TAG, "Got a primary light state of " + state);
                         LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
                         break;
                     }

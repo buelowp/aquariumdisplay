@@ -60,6 +60,7 @@ public class MainActivity extends Activity {
         LocalBroadcastManager.getInstance(this).registerReceiver(m_settingsReceiver, new IntentFilter("settings-event"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_teensyReceiver, new IntentFilter("teensy-event"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_brightnessReceiver, new IntentFilter("teensy-event-brightness"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_primaryLightsReceiver, new IntentFilter("teensy-event-primary-light-state"));
 
         m_settings = new Intent(this, SettingsActivity.class);
         m_webview = new Intent(this, WebviewActivity.class);
@@ -180,7 +181,7 @@ public class MainActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            int value = intent.getIntExtra("ACTION", 0);
+            boolean value = intent.getBooleanExtra("ACTION", false);
             Log.d(TAG, "Toggling UV state");
             Intent msg = new Intent("uv-state");
             msg.putExtra("ACTION", value);
@@ -195,6 +196,18 @@ public class MainActivity extends Activity {
             int value = intent.getIntExtra("ACTION", 0);
             Log.d(TAG, "Updating LED brightness");
             Intent msg = new Intent("led-brightness");
+            msg.putExtra("ACTION", value);
+            LocalBroadcastManager.getInstance(context).sendBroadcast(msg);
+        }
+    };
+
+    private BroadcastReceiver m_primaryLightsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            boolean value = intent.getBooleanExtra("ACTION", false);
+            Log.d(TAG, "Updating primary light state");
+            Intent msg = new Intent("led-state");
             msg.putExtra("ACTION", value);
             LocalBroadcastManager.getInstance(context).sendBroadcast(msg);
         }

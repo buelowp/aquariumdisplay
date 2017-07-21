@@ -28,6 +28,8 @@ public class LightsActivity extends Activity {
     private Sunposition m_sun = new Sunposition(LATITUDE, LONGITUDE, -5);
 
     private ToggleButton tbUVState;
+    private ToggleButton tbAllLights;
+    private ToggleButton tbSunLights;
     private SeekBar m_sbBrightness;
     private Context m_context;
 
@@ -44,7 +46,10 @@ public class LightsActivity extends Activity {
 
         LocalBroadcastManager.getInstance(this).registerReceiver(m_uvStateReceiver, new IntentFilter("uv-state"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_ledBrightnessReceiver, new IntentFilter("led-brightness"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_primaryLightsStateReceiver, new IntentFilter("led-state"));
         tbUVState = (ToggleButton)findViewById(R.id.toggleButton_UVLights);
+        tbAllLights = (ToggleButton)findViewById(R.id.toggleButton_allLights);
+        tbSunLights = (ToggleButton)findViewById(R.id.toggleButton_dayLights);
 
         m_sbBrightness = (SeekBar)findViewById(R.id.seekBar_brightness);
         m_sbBrightness.setMax(255);
@@ -80,6 +85,7 @@ public class LightsActivity extends Activity {
         MessagePayload msg = new MessagePayload();
         msg.getUVState();
         msg.getBrightness();
+        msg.getSunLight();
         msg.makeFinal();
 
         Intent i = new Intent("teensy-event");
@@ -215,15 +221,32 @@ public class LightsActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            int value = intent.getIntExtra("ACTION", 0);
-            Log.d(TAG, "Got a uv state of " + value);
-            if (value != 0) {
-                tbUVState.setChecked(true);
-            }
-            else
-                tbUVState.setChecked(false);
+            boolean value = intent.getBooleanExtra("ACTION", false);
+            Log.d(TAG, "Got a UV Lights state of " + value);
+            tbUVState.setChecked(value);
+            setAllLightsState();
         }
     };
+
+    private BroadcastReceiver m_primaryLightsStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            boolean value = intent.getBooleanExtra("ACTION", false);
+            Log.d(TAG, "Got a Primary Lights state of " + value);
+            tbSunLights.setChecked(value);
+            setAllLightsState();
+        }
+    };
+
+    private void setAllLightsState()
+    {
+        if (!tbUVState.isChecked() && !tbSunLights.isChecked()) {
+            tbAllLights.setChecked(false);
+        }
+        else
+            tbAllLights.setChecked(true);
+    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -235,13 +258,10 @@ public class LightsActivity extends Activity {
         //handle 'swipe left' action only
 
         @Override
-        public boolean onFling(MotionEvent event1, MotionEvent event2,
-                               float velocityX, float velocityY) {
-
+        public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
             if(event2.getX() > event1.getX()){
                 finish();
             }
-
             return true;
         }
     }
