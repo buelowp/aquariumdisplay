@@ -150,16 +150,16 @@ public class MicroCom {
     }
 
     private void parseMessage(byte[] buf, int length) {
-        Log.d(TAG, "Got a message of size: " + length);
-        Log.d(TAG, "Message contents are: " + Arrays.toString(buf));
+//        Log.d(TAG, "Got a message of size: " + length);
+//        Log.d(TAG, "Message contents are: " + Arrays.toString(buf));
 
         if (((buf[0] & 0xFF) == 0xF0) && ((buf[length - 1] & 0xFF) == 0xF1)) {
             int msgSize = buf[1];
             int msgCount = buf[2];
             int index = 3;
 
-            Log.d(TAG, "Got message of size " + msgSize + ", with " + msgCount + " messages inside");
-            Log.d(TAG, "Checking message id " + (buf[index] & 0xFF) + " at index " + index);
+//            Log.d(TAG, "Got message of size " + msgSize + ", with " + msgCount + " messages inside");
+//            Log.d(TAG, "Checking message id " + (buf[index] & 0xFF) + " at index " + index);
             for (int i = 0; i < msgCount; i++) {
                 switch ((buf[index++] & 0xFF)) {
                     case 0xAA: {
@@ -221,7 +221,7 @@ public class MicroCom {
                     }
                     case 0x08: {
                         int packetSize = buf[index++];
-                        int state = buf[index++];
+                        int state = buf[index++] & 0xFF;
                         Intent msg = new Intent("teensy-event-pumpstate");
                         msg.putExtra("ACTION", state);
                         Log.d(TAG, "Got a pump state of " + state);
@@ -230,7 +230,7 @@ public class MicroCom {
                     }
                     case 0x09: {
                         int packetSize = buf[index++];
-                        int state = buf[index++];
+                        int state = buf[index++] & 0xFF;
                         Intent msg = new Intent("teensy-event-heaterstate");
                         msg.putExtra("ACTION", state);
                         Log.d(TAG, "Got a heater state of " + state);

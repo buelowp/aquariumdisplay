@@ -29,6 +29,7 @@ public class LightsActivity extends Activity {
 
     private ToggleButton tbUVState;
     private SeekBar m_sbBrightness;
+    private Context m_context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +37,7 @@ public class LightsActivity extends Activity {
         setContentView(R.layout.activity_lights);
 
         m_gd = new GestureDetector(this, new LightsActivity.MyGestureListener());
+        m_context = this;
 
         Calendar date = Calendar.getInstance();
         m_sun.setCurrentDate(date.get(date.YEAR), date.get(date.MONTH) + 1, date.get(date.DAY_OF_MONTH));
@@ -43,8 +45,32 @@ public class LightsActivity extends Activity {
         LocalBroadcastManager.getInstance(this).registerReceiver(m_uvStateReceiver, new IntentFilter("uv-state"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_ledBrightnessReceiver, new IntentFilter("led-brightness"));
         tbUVState = (ToggleButton)findViewById(R.id.toggleButton_UVLights);
+
         m_sbBrightness = (SeekBar)findViewById(R.id.seekBar_brightness);
         m_sbBrightness.setMax(255);
+        m_sbBrightness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int progressChanged = 0;
+
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+                progressChanged = progress;
+            }
+
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
+
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                MessagePayload msg = new MessagePayload();
+                msg.setBrightness((byte)progressChanged);
+                msg.makeFinal();
+
+                Intent i = new Intent("teensy-event");
+                i.putExtra("ACTION", msg.getMessage());
+                LocalBroadcastManager.getInstance(m_context).sendBroadcast(i);
+
+                Log.d(TAG, "Progress is " + progressChanged);
+            }
+        });
 
         getInitialData();
         handler.postDelayed(finalizer, VIEW_TIMEOUT);
@@ -60,8 +86,12 @@ public class LightsActivity extends Activity {
         Intent i = new Intent("teensy-event");
         i.putExtra("ACTION", msg.getMessage());
         LocalBroadcastManager.getInstance(this).sendBroadcast(i);
+    }
+
+    private void seekBarChangeListenenr() {
 
     }
+
     @Override
     protected void onStart() {
         super.onStart();

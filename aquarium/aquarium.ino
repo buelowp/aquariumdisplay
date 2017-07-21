@@ -107,6 +107,8 @@ void setLedBrightness(byte b[], int bytes)
   Serial.println(b[0]);
   FastLED.setBrightness(b[0]);
   FastLED.show();
+  g_brightness = (uint8_t)b[0];
+  getLightBrightness();
 }
 
 void getWaterLevel()
@@ -323,6 +325,7 @@ void setup()
   pinMode(7, OUTPUT);
   digitalWrite(7, 1);
   digitalWrite(UV_PIN, 1);
+  digitalWrite(PUMP_PIN, 1);
   sensors.begin();
   FastLED.addLeds<APA102>(leds, NUM_LEDS);
   msgIndex = 0;

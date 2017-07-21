@@ -181,7 +181,7 @@ public class MainActivity extends Activity {
                 state = false;
             Intent msg = new Intent("pump-state");
             msg.putExtra("ACTION", state);
-            Log.d(TAG, "Got pump state: " + value);
+            Log.d(TAG, "Got heater state: " + value);
             LocalBroadcastManager.getInstance(context).sendBroadcast(msg);
         }
     };
