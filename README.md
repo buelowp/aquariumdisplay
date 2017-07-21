@@ -1,6 +1,8 @@
-# Using a BeagleBone to monitor and control an aquarium
+# Using a RPi 3, a Teensy, and Android things to monitor and control an aquarium
 
-This project is dedicated to using a small Linux computer to read and react to inputs, control lighting, and provide a touchscreen based UI for tank information.
+With the advent of Android Things, it becomes possible to quickly create a functional UI with a Raspberry PI. I know there are lots of ways to create UI's on the PI, but to be fair, Android would be the best way. This makes it relatively easy, even for a newb Android developer
 
 ## Why?
-Basically, I can. I have lots of available horsepower, so why not use it. My choice is to use a BeagleBone Black, connected to a touchscreen, and then attach all of the sensors and data gathering I can get at. For now, that will be limited to two temperature inputs, and a water level sensor. It will also control tank lighting for me, running a strip of WS2812B LED's effectively on a timer.
+I like to automate things, and I want a way to see what fish are in the tank. I always forget names, so why not let the web tell everyone what's in my tank? Plus, getting data out of the tank, and controlling some aspects directly is a tantalizing concept. Android Things and the Teensy let me do this.
+
+To be fair, standard Android would do this as well, and may be a better choice in the long run. WebView is not available yet, and I don't use PeripheralManager at all anymore, in favor of doing all the control from the Teensy.
