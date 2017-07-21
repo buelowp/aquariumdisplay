@@ -75,19 +75,19 @@ public class SettingsActivity extends Activity {
         LocalBroadcastManager.getInstance(this).registerReceiver(m_waterLevelMessage, new IntentFilter("water-level"));
         setCelestialBodies();
         getInitialData();
-
-        handler.postDelayed(finalizer, VIEW_TIMEOUT);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        handler.postDelayed(finalizer, VIEW_TIMEOUT);
         Log.d(TAG, "onStart");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        handler.removeCallbacks(finalizer);
         Log.d(TAG, "onStop");
     }
 
@@ -123,7 +123,7 @@ public class SettingsActivity extends Activity {
         public void onReceive(Context context, Intent intent)
         {
             float value = intent.getFloatExtra("ACTION", 0);
-            m_leftTemp.setText("" + value);
+            m_leftTemp.setText(String.valueOf(value));
         }
     };
 
@@ -132,7 +132,7 @@ public class SettingsActivity extends Activity {
         public void onReceive(Context context, Intent intent)
         {
             float value = intent.getFloatExtra("ACTION", 0);
-            m_rightTemp.setText("" + value);
+            m_rightTemp.setText(String.valueOf(value));
         }
     };
 
@@ -154,8 +154,18 @@ public class SettingsActivity extends Activity {
         int sunsetMin = (int)sunset % 60;
 
         m_moonphase.setText(String.valueOf(m_sun.moonPhase()));
-        m_sunrise.setText("" + sunriseHour + ":" + sunriseMin + " AM");
-        m_sunset.setText("" + sunsetHour + ":" + sunsetMin + " PM");
+        StringBuilder sbSunrise = new StringBuilder();
+        sbSunrise.append(sunriseHour);
+        sbSunrise.append(":");
+        sbSunrise.append(sunriseMin);
+        sbSunrise.append(" AM");
+        m_sunrise.setText(sbSunrise.toString());
+        StringBuilder sbSunset = new StringBuilder();
+        sbSunset.append(sunsetHour);
+        sbSunset.append(":");
+        sbSunset.append(sunsetMin);
+        sbSunset.append(" PM");
+        m_sunset.setText(sbSunset);
 
         TimeZone tz = date.getTimeZone();
 

@@ -73,7 +73,6 @@ public class LightsActivity extends Activity {
         });
 
         getInitialData();
-        handler.postDelayed(finalizer, VIEW_TIMEOUT);
         Log.d(TAG, "onCreate()");
     }
 
@@ -88,19 +87,17 @@ public class LightsActivity extends Activity {
         LocalBroadcastManager.getInstance(this).sendBroadcast(i);
     }
 
-    private void seekBarChangeListenenr() {
-
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
+        handler.postDelayed(finalizer, VIEW_TIMEOUT);
         Log.d(TAG, "onStart");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        handler.removeCallbacks(finalizer);
         Log.d(TAG, "onStop");
     }
 

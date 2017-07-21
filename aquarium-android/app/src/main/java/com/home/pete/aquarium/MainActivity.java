@@ -156,14 +156,9 @@ public class MainActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            int value = intent.getIntExtra("ACTION", 0);
-            boolean state;
-            if (value != 0)
-                state = true;
-            else
-                state = false;
+            boolean value = intent.getBooleanExtra("ACTION", false);
             Intent msg = new Intent("pump-state");
-            msg.putExtra("ACTION", state);
+            msg.putExtra("ACTION", value);
             Log.d(TAG, "Got pump state: " + value);
             LocalBroadcastManager.getInstance(context).sendBroadcast(msg);
         }
@@ -173,14 +168,9 @@ public class MainActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            int value = intent.getIntExtra("ACTION", 0);
-            boolean state;
-            if (value != 0)
-                state = true;
-            else
-                state = false;
+            boolean value = intent.getBooleanExtra("ACTION", false);
             Intent msg = new Intent("pump-state");
-            msg.putExtra("ACTION", state);
+            msg.putExtra("ACTION", value);
             Log.d(TAG, "Got heater state: " + value);
             LocalBroadcastManager.getInstance(context).sendBroadcast(msg);
         }

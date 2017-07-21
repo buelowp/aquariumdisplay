@@ -18,16 +18,14 @@ public class MicroCom {
     private final String TAG = this.getClass().getName();
     private static final String DEV_NAME = "UART0";
 
-    private PeripheralManagerService m_manager = new PeripheralManagerService();
     private UartDevice m_device;
     private Context m_context;
-    public boolean m_helloReceived;
 
-    public MicroCom(Context context)
+    MicroCom(Context context)
     {
+        PeripheralManagerService m_manager = new PeripheralManagerService();
         m_context = context;
         try {
-            List<String> deviceList = m_manager.getUartDeviceList();
             m_device = m_manager.openUartDevice(DEV_NAME);
             m_device.registerUartDeviceCallback(mUartCallback);
             configureDevice();
@@ -35,8 +33,6 @@ public class MicroCom {
         catch (IOException e) {
             Log.e(TAG, "Error starting UART device " + DEV_NAME + ": " + e.getMessage());
         }
-
-        m_helloReceived = false;
     }
 
     public void close() {
@@ -50,7 +46,7 @@ public class MicroCom {
         }
     }
 
-    public void sendHello() {
+    void sendHello() {
         MessagePayload msg = new MessagePayload();
         msg.sendHello();
         msg.makeFinal();
@@ -128,7 +124,7 @@ public class MicroCom {
         }
     }
 
-    public void sendPreformattedMsg(byte[] msg) {
+    void sendPreformattedMsg(byte[] msg) {
         try {
             writeData(msg);
         }
@@ -150,16 +146,13 @@ public class MicroCom {
     }
 
     private void parseMessage(byte[] buf, int length) {
-//        Log.d(TAG, "Got a message of size: " + length);
-//        Log.d(TAG, "Message contents are: " + Arrays.toString(buf));
-
         if (((buf[0] & 0xFF) == 0xF0) && ((buf[length - 1] & 0xFF) == 0xF1)) {
             int msgSize = buf[1];
             int msgCount = buf[2];
             int index = 3;
 
-//            Log.d(TAG, "Got message of size " + msgSize + ", with " + msgCount + " messages inside");
-//            Log.d(TAG, "Checking message id " + (buf[index] & 0xFF) + " at index " + index);
+            Log.d(TAG, "Got message of size " + msgSize + ", with " + msgCount + " messages inside");
+            Log.d(TAG, "Checking message id " + (buf[index] & 0xFF) + " at index " + index);
             for (int i = 0; i < msgCount; i++) {
                 switch ((buf[index++] & 0xFF)) {
                     case 0xAA: {
@@ -168,17 +161,20 @@ public class MicroCom {
                         Log.d(TAG, "Got a handshake reponse");
                         LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
                         index++;
-                        m_helloReceived = true;
                         break;
                     }
                     case 0x03: {
                         int packetSize = buf[index++];
-                        byte[] f = new byte[packetSize];
-                        for (int j = 0; j < packetSize; j++) {
-                            f[j] = buf[index + j];
+                        float response;
+                        try {
+                            byte[] f = Arrays.copyOfRange(buf, index, (index + packetSize));
+                            response = ByteBuffer.wrap(f).order(ByteOrder.LITTLE_ENDIAN).getFloat();
+                        }
+                        catch (ArrayIndexOutOfBoundsException | IllegalArgumentException | NullPointerException e) {
+                            Log.e(TAG, "Array copy exception: " + e.getMessage());
+                            break;
                         }
                         index += packetSize;
-                        float response = ByteBuffer.wrap(f).order(ByteOrder.LITTLE_ENDIAN).getFloat();
                         Intent msg = new Intent("teensy-event-waterlevel");
                         msg.putExtra("ACTION", response);
                         Log.d(TAG, "Received a water level from the Teensy of value " + response);
@@ -187,8 +183,8 @@ public class MicroCom {
                     }
                     case 0x04: {
                         int packetSize = buf[index++];
-                        float left = 0;
-                        float right = 0;
+                        float left;
+                        float right;
                         Log.d(TAG, "Got packetsize of " + packetSize + " and am at index " + index);
                         try {
                             byte[] l = Arrays.copyOfRange(buf, index, (index + 4));
@@ -200,6 +196,7 @@ public class MicroCom {
                         }
                         catch (ArrayIndexOutOfBoundsException | IllegalArgumentException | NullPointerException e) {
                             Log.e(TAG, "Array copy exception: " + e.getMessage());
+                            break;
                         }
                         Log.d(TAG, "Got left temp " + left + " and right temp " + right);
                         Intent msg_l = new Intent("teensy-event-temp-left");
@@ -211,8 +208,8 @@ public class MicroCom {
                         break;
                     }
                     case 0x07: {
-                        int packetSize = buf[index++];
-                        int state = buf[index++];
+                        index++;
+                        boolean state = !((buf[index++] & 0xFF) == 0);
                         Intent msg = new Intent("teensy-event-uvstate");
                         msg.putExtra("ACTION", state);
                         Log.d(TAG, "Got UV state of " + state);
@@ -220,8 +217,8 @@ public class MicroCom {
                         break;
                     }
                     case 0x08: {
-                        int packetSize = buf[index++];
-                        int state = buf[index++] & 0xFF;
+                        index++;
+                        boolean state = !((buf[index++] & 0xFF) == 0);
                         Intent msg = new Intent("teensy-event-pumpstate");
                         msg.putExtra("ACTION", state);
                         Log.d(TAG, "Got a pump state of " + state);
@@ -229,8 +226,8 @@ public class MicroCom {
                         break;
                     }
                     case 0x09: {
-                        int packetSize = buf[index++];
-                        int state = buf[index++] & 0xFF;
+                        index++;
+                        boolean state = !((buf[index++] & 0xFF) == 0);
                         Intent msg = new Intent("teensy-event-heaterstate");
                         msg.putExtra("ACTION", state);
                         Log.d(TAG, "Got a heater state of " + state);
@@ -238,7 +235,7 @@ public class MicroCom {
                         break;
                     }
                     case 0x0C: {
-                        int packetSize = buf[index++];
+                        index++;
                         int state = buf[index++] & 0xFF;
                         Intent msg = new Intent("teensy-event-brightness");
                         msg.putExtra("ACTION", state);
