@@ -26,6 +26,7 @@ public class LightsActivity extends Activity {
     private Handler handler = new Handler();
     private GestureDetector m_gd;
     private Sunposition m_sun = new Sunposition(LATITUDE, LONGITUDE, -5);
+    private SunLights m_sunlights = new SunLights(this);
 
     private ToggleButton tbUVState;
     private ToggleButton tbAllLights;
@@ -78,6 +79,7 @@ public class LightsActivity extends Activity {
         });
 
         getInitialData();
+        m_sun.setTZOffset(m_sunlights.getTZOffset());
         Log.d(TAG, "onCreate()");
     }
 

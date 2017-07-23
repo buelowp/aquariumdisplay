@@ -3,6 +3,7 @@ package com.home.pete.aquarium;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.content.*;
@@ -43,6 +44,7 @@ public class MainActivity extends Activity {
     private Intent m_webview;
     private Intent m_lights;
     private MicroCom m_teensy = new MicroCom(this);
+    private SunLights m_sunlights= new SunLights(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,17 +70,23 @@ public class MainActivity extends Activity {
 
         if (!m_teensy.m_helloReceived)
             m_teensy.sendHello();
+
+        AlarmManager am = (AlarmManager)getBaseContext().getSystemService(Context.ALARM_SERVICE);
+        am.setTimeZone("America/Chicago");
+//        Settings.Global.putInt(getContentResolver(), Settings.Global.SCREEN_OFF_TIMEOUT, 60000);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        m_sunlights.startOperation();
         Log.d(TAG, "onStart");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        m_sunlights.endOperation();
         Log.d(TAG, "onStop");
     }
 
