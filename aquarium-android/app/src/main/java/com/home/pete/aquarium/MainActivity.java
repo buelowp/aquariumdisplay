@@ -63,6 +63,7 @@ public class MainActivity extends Activity {
         LocalBroadcastManager.getInstance(this).registerReceiver(m_teensyReceiver, new IntentFilter("teensy-event"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_brightnessReceiver, new IntentFilter("teensy-event-brightness"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_primaryLightsReceiver, new IntentFilter("teensy-event-primary-light-state"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_rgbValueReceiver, new IntentFilter("teensy-event-rgb"));
 
         m_settings = new Intent(this, SettingsActivity.class);
         m_webview = new Intent(this, WebviewActivity.class);
@@ -216,6 +217,18 @@ public class MainActivity extends Activity {
             boolean value = intent.getBooleanExtra("ACTION", false);
             Log.d(TAG, "Updating primary light state");
             Intent msg = new Intent("led-state");
+            msg.putExtra("ACTION", value);
+            LocalBroadcastManager.getInstance(context).sendBroadcast(msg);
+        }
+    };
+
+    private BroadcastReceiver m_rgbValueReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            int[] value = intent.getIntArrayExtra("ACTION");
+            Log.d(TAG, "Updating RGB values");
+            Intent msg = new Intent("rgb-state");
             msg.putExtra("ACTION", value);
             LocalBroadcastManager.getInstance(context).sendBroadcast(msg);
         }

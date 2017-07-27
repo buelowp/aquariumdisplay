@@ -147,3 +147,14 @@ void Message::setPrimaryLightState(uint8_t value)
   m_internal[INDEX_MSG_SIZE] += 3;
 }
 
+void Message::setRGBValues(CRGB c)
+{
+  m_internal[m_currIndex++] = 13;
+  m_internal[m_currIndex++] = 1;
+  m_internal[m_currIndex++] = c.r;
+  m_internal[m_currIndex++] = c.g;
+  m_internal[m_currIndex++] = c.b;
+  m_internal[INDEX_MSG_COUNT] += 1;
+  m_internal[INDEX_MSG_SIZE] += 5;  
+}
+

@@ -155,6 +155,22 @@ void toggleUV()
   getUVState();
 }
 
+void turnOnUVLights()
+{
+  digitalWrite(UV_PIN, 1);
+  Serial.print("Setting UV to state ");
+  Serial.println(digitalRead(UV_PIN));
+  getUVState();
+}
+
+void turnOffUVLights()
+{
+  digitalWrite(UV_PIN, 0);
+  Serial.print("Setting UV to state ");
+  Serial.println(digitalRead(UV_PIN));
+  getUVState();
+}
+
 void getUVState()
 {
   Message msg;
@@ -234,6 +250,18 @@ void toggleAllLights()
   getUVState();
   getLightBrightness();
   getSunlightState();
+}
+
+void getRGBValues()
+{
+  Serial.println("Retrieving RGB values");
+  Message msg;
+  msg.setRGBValues(leds[0]);
+  msg.makeFinal();
+  msg.printBuffer();
+  Serial1.write(msg.getBuffer(), msg.getSize());
+  Serial1.flush();
+  delay(100);
 }
 
 void togglePumpState()
@@ -322,6 +350,15 @@ void parseThingsMsg(byte msg[])
           break;
         case 0x0F:
           getSunlightState();
+          break;
+        case 0x10:
+          turnOnUVLights();
+          break;
+        case 0x11:
+          turnOffUVLights();
+          break;
+        case 0x13:
+          getRGBValues();
           break;
         default:
           Serial.println("Unknown message");

@@ -13,6 +13,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import java.util.Calendar;
@@ -31,6 +32,7 @@ public class LightsActivity extends Activity {
     private ToggleButton tbUVState;
     private ToggleButton tbAllLights;
     private ToggleButton tbSunLights;
+    private ToggleButton tbCloudy;
     private SeekBar m_sbBrightness;
     private Context m_context;
 
@@ -48,9 +50,12 @@ public class LightsActivity extends Activity {
         LocalBroadcastManager.getInstance(this).registerReceiver(m_uvStateReceiver, new IntentFilter("uv-state"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_ledBrightnessReceiver, new IntentFilter("led-brightness"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_primaryLightsStateReceiver, new IntentFilter("led-state"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_rgbValueReceiver, new IntentFilter("rgb-state"));
+
         tbUVState = (ToggleButton)findViewById(R.id.toggleButton_UVLights);
         tbAllLights = (ToggleButton)findViewById(R.id.toggleButton_allLights);
         tbSunLights = (ToggleButton)findViewById(R.id.toggleButton_dayLights);
+        tbCloudy = (ToggleButton)findViewById(R.id.toggleButton_cloudy);
 
         m_sbBrightness = (SeekBar)findViewById(R.id.seekBar_brightness);
         m_sbBrightness.setMax(255);
@@ -123,6 +128,12 @@ public class LightsActivity extends Activity {
             finish();
         }
     };
+
+    public void setToCloudy(View view) {
+        handler.removeCallbacks(finalizer);
+        tbCloudy.setChecked(m_sunlights.toggleCloudy());
+        handler.postDelayed(finalizer, VIEW_TIMEOUT);
+    }
 
     public void toggleUV(View view) {
         handler.removeCallbacks(finalizer);
@@ -238,6 +249,29 @@ public class LightsActivity extends Activity {
             Log.d(TAG, "Got a Primary Lights state of " + value);
             tbSunLights.setChecked(value);
             setAllLightsState();
+        }
+    };
+
+    private BroadcastReceiver m_rgbValueReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            int[] colors = intent.getIntArrayExtra("ACTION");
+            Log.d(TAG, "Got a Primary Lights state of " + colors);
+            TextView r = (TextView)findViewById(R.id.textview_red);
+            TextView g = (TextView)findViewById(R.id.textview_green);
+            TextView b = (TextView)findViewById(R.id.textview_blue);
+            try {
+                r.setText(String.valueOf(colors[0]));
+                g.setText(String.valueOf(colors[1]));
+                b.setText(String.valueOf(colors[2]));
+            }
+            catch (ArrayIndexOutOfBoundsException e) {
+                Log.e(TAG, "RGB array Index error " + e.getMessage());
+                r.setText("-1");
+                g.setText("-1");
+                b.setText("-1");
+            }
         }
     };
 

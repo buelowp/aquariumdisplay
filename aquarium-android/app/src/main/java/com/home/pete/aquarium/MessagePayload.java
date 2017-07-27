@@ -64,6 +64,24 @@ public class MessagePayload {
         m_currentMessageSize += 2;
     }
 
+    public void enableUVLights()
+    {
+        m_internal[m_currIndex++] = (byte)0x10;
+        m_internal[m_currIndex++] = (byte)0x00;
+        m_internal[m_messageCount] += (byte)0x01;
+        m_internal[m_messageSize] += (byte)0x02;
+        m_currentMessageSize += 2;
+    }
+
+    public void disableUVLights()
+    {
+        m_internal[m_currIndex++] = (byte)0x11;
+        m_internal[m_currIndex++] = (byte)0x00;
+        m_internal[m_messageCount] += (byte)0x01;
+        m_internal[m_messageSize] += (byte)0x02;
+        m_currentMessageSize += 2;
+    }
+
     public void togglePumpState()
     {
         m_internal[m_currIndex++] = (byte)0x0D;
@@ -182,6 +200,15 @@ public class MessagePayload {
     }
 
     public void getSunLight()
+    {
+        m_internal[m_currIndex++] = (byte)0x0F;
+        m_internal[m_currIndex++] = (byte)0x00;
+        m_internal[m_messageCount] += (byte)0x01;
+        m_internal[m_messageSize] += (byte)0x02;
+        m_currentMessageSize += 2;
+    }
+
+    public void getRGBValue()
     {
         m_internal[m_currIndex++] = (byte)0x0F;
         m_internal[m_currIndex++] = (byte)0x00;

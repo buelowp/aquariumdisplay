@@ -255,6 +255,18 @@ public class MicroCom {
                         LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
                         break;
                     }
+                    case 0x13: {
+                        int[] colors = new int[3];
+                        index++;
+                        colors[0] = buf[index++] & 0xFF;
+                        colors[1] = buf[index++] & 0xFF;
+                        colors[2] = buf[index++] & 0xFF;
+                        Intent msg = new Intent("teensy-event-rgb");
+                        msg.putExtra("ACTION", colors);
+                        Log.d(TAG, "Got an RGB response of " + colors);
+                        LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
+                        break;
+                    }
                 }
             }
         }
