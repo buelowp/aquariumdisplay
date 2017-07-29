@@ -93,6 +93,7 @@ public class LightsActivity extends Activity {
         msg.getUVState();
         msg.getBrightness();
         msg.getSunLight();
+        msg.getRGBValue();
         msg.makeFinal();
 
         Intent i = new Intent("teensy-event");
@@ -258,19 +259,19 @@ public class LightsActivity extends Activity {
         {
             int[] colors = intent.getIntArrayExtra("ACTION");
             Log.d(TAG, "Got a Primary Lights state of " + colors);
-            TextView r = (TextView)findViewById(R.id.textview_red);
-            TextView g = (TextView)findViewById(R.id.textview_green);
-            TextView b = (TextView)findViewById(R.id.textview_blue);
+            TextView r = (TextView)findViewById(R.id.textView_Red);
+            TextView g = (TextView)findViewById(R.id.textView_Green);
+            TextView b = (TextView)findViewById(R.id.textView_Blue);
             try {
-                r.setText(String.valueOf(colors[0]));
-                g.setText(String.valueOf(colors[1]));
-                b.setText(String.valueOf(colors[2]));
+                r.setText(getResources().getString(R.string.textview_red) + String.valueOf(colors[0]));
+                g.setText(getResources().getString(R.string.textview_green)+ String.valueOf(colors[1]));
+                b.setText(getResources().getString(R.string.textview_blue) + String.valueOf(colors[2]));
             }
             catch (ArrayIndexOutOfBoundsException e) {
                 Log.e(TAG, "RGB array Index error " + e.getMessage());
-                r.setText("-1");
-                g.setText("-1");
-                b.setText("-1");
+                r.setText(getResources().getString(R.string.textview_red) + String.valueOf(-1));
+                g.setText(getResources().getString(R.string.textview_green)+ String.valueOf(-1));
+                b.setText(getResources().getString(R.string.textview_blue) + String.valueOf(-1));
             }
         }
     };

@@ -105,9 +105,7 @@ public class SunLights {
         MessagePayload msg = new MessagePayload();
         msg.setColor((byte)(r & 0xFF), (byte)(g & 0xFF), (byte)(b & 0xFF));
         msg.makeFinal();
-        Intent i = new Intent("teensy-event");
-        i.putExtra("ACTION", msg.getMessage());
-        LocalBroadcastManager.getInstance(m_context).sendBroadcast(i);
+        sendMessage(msg);
     }
 
     private void setLEDBrightness(int value)
@@ -115,10 +113,7 @@ public class SunLights {
         MessagePayload msg = new MessagePayload();
         msg.setBrightness((byte)(value & 0xFF));
         msg.makeFinal();
-
-        Intent i = new Intent("teensy-event");
-        i.putExtra("ACTION", msg.getMessage());
-        LocalBroadcastManager.getInstance(m_context).sendBroadcast(i);
+        sendMessage(msg);
     }
 
     private int getCalculatedSunrise()
@@ -182,7 +177,18 @@ public class SunLights {
 
     private void turnOnUV()
     {
+        Log.d(TAG, "Turning on the UV strip");
+        MessagePayload msg = new MessagePayload();
+        msg.turnOnUVLights();
+        msg.makeFinal();
+        sendMessage(msg);
+    }
 
+    private void sendMessage(MessagePayload msg)
+    {
+        Intent i = new Intent("teensy-event");
+        i.putExtra("ACTION", msg.getMessage());
+        LocalBroadcastManager.getInstance(m_context).sendBroadcast(i);
     }
 
     Runnable periodicUpdate = new Runnable() {
@@ -196,12 +202,14 @@ public class SunLights {
             try {
                 if ((sunrise > 0) && !isDaytime()) {
                     Log.d(TAG, "Running sunrise with offset " + sunrise);
+                    setLEDColor(255, 255, 255);
                     setLEDBrightness(sunrise * 3);
                     m_lastBrightness = sunrise * 3;
                 }
                 else if (isDaytime()) {
                     Log.d(TAG, "Running daytime");
                     if (!m_cloudy) {
+                        setLEDColor(255, 255, 255);
                         setLEDBrightness(180);
                         m_lastBrightness = 180;
                     }
@@ -219,12 +227,14 @@ public class SunLights {
                         else if (m_lastBrightness == 150)
                             value = -3;
 
+                        setLEDColor(255, 255, 255);
                         setLEDBrightness(m_lastBrightness + value);
                         m_lastBrightness += value;
                     }
                 }
                 else if ((sunset > 0) && !isDaytime()) {
                     Log.d(TAG, "Running sunset with offset " + sunset);
+                    setLEDColor(255, 255, 255);
                     setLEDBrightness(180 - (sunset * 3));
                     m_lastBrightness = 180 - (sunset * 3);
                 }
@@ -235,6 +245,7 @@ public class SunLights {
                         moonphase = 29 - moonphase;
                     }
                     Log.d(TAG, "the moon is at position " + moonphase);
+                    setLEDColor(0, 0, 255);
                     setLEDBrightness((byte)((int)moonphase & 0xFF));
                 }
 

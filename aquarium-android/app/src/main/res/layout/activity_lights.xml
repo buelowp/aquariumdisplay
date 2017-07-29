@@ -156,83 +156,68 @@
         tools:layout_editor_absoluteX="234dp"
         tools:layout_editor_absoluteY="162dp"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="52dp" />
+        android:layout_marginStart="52dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintTop_toBottomOf="@+id/toggleButton_UVLights" />
 
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="50dp"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        tools:layout_editor_absoluteX="516dp"
-        tools:text="@string/textview_red"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/textView7" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="50dp"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        tools:layout_editor_absoluteX="516dp"
-        tools:layout_editor_absoluteY="244dp"
-        tools:text="@string/textview_green"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
-
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="50dp"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        tools:layout_editor_absoluteX="516dp"
-        tools:layout_editor_absoluteY="278dp"
-        tools:text="@string/textview_blue"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
-
-    <TextView
-        android:id="@+id/textview_red"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintStart_toEndOf="@+id/textView"
-        app:layout_constraintTop_toBottomOf="@+id/textView7"
-        tools:layout_editor_absoluteX="578dp"
-        tools:layout_editor_absoluteY="218dp" />
-
-    <TextView
-        android:id="@+id/textview_green"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintStart_toEndOf="@+id/textView2"
-        app:layout_constraintTop_toBottomOf="@+id/textview_red"
-        tools:layout_editor_absoluteX="578dp"
-        tools:layout_editor_absoluteY="244dp" />
-
-    <TextView
-        android:id="@+id/textview_blue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintStart_toEndOf="@+id/textView3"
-        app:layout_constraintTop_toBottomOf="@+id/textview_green"
-        tools:layout_editor_absoluteX="578dp"
-        tools:layout_editor_absoluteY="278dp" />
-
-    <TextView
-        android:id="@+id/textView7"
+        android:id="@+id/textView_Red"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:text="TextView"
+        android:layout_marginEnd="200dp"
+        android:layout_marginTop="16dp"
+        android:paddingLeft="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_ledColorStatic"
+        tools:layout_editor_absoluteX="543dp"
+        tools:text="@string/textview_red"
+        android:layout_marginStart="198dp"
+        app:layout_constraintStart_toEndOf="@+id/toggleButton_cloudy" />
+
+    <TextView
+        android:id="@+id/textView_Green"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="200dp"
+        android:layout_marginTop="16dp"
+        android:paddingLeft="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_Red"
+        tools:layout_editor_absoluteX="543dp"
+        tools:layout_editor_absoluteY="244dp"
+        tools:text="@string/textview_green"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="400dp" />
+
+    <TextView
+        android:id="@+id/textView_Blue"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="200dp"
+        android:layout_marginTop="16dp"
+        android:paddingLeft="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_Green"
+        tools:layout_editor_absoluteX="543dp"
+        tools:layout_editor_absoluteY="278dp"
+        tools:text="@string/textview_blue"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="400dp"
+        android:layout_marginBottom="29dp"
+        app:layout_constraintBottom_toTopOf="@+id/textView_setBrightness" />
+
+    <TextView
+        android:id="@+id/textView_ledColorStatic"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="200dp"
         android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:layout_editor_absoluteX="430dp"
-        tools:layout_editor_absoluteY="149dp"
+        tools:layout_editor_absoluteY="162dp"
+        tools:text="@string/textview_text_color"
+        android:layout_marginStart="198dp"
+        app:layout_constraintStart_toEndOf="@+id/toggleButton_cloudy"
         android:layout_marginTop="32dp"
-        app:layout_constraintTop_toBottomOf="@+id/toggleButton_allLights"
-        android:layout_marginEnd="85dp"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/toggleButton_allLights" />
 </android.support.constraint.ConstraintLayout>

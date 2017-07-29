@@ -74,20 +74,18 @@ public class MainActivity extends Activity {
 
         AlarmManager am = (AlarmManager)getBaseContext().getSystemService(Context.ALARM_SERVICE);
         am.setTimeZone("America/Chicago");
-//        Settings.Global.putInt(getContentResolver(), Settings.Global.SCREEN_OFF_TIMEOUT, 60000);
+        m_sunlights.startOperation();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        m_sunlights.startOperation();
         Log.d(TAG, "onStart");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        m_sunlights.endOperation();
         Log.d(TAG, "onStop");
     }
 
@@ -95,6 +93,7 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy");
+        m_sunlights.endOperation();
     }
 
     private BroadcastReceiver m_teensyReceiver = new BroadcastReceiver() {

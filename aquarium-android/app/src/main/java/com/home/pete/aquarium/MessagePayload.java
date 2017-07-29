@@ -217,6 +217,24 @@ public class MessagePayload {
         m_currentMessageSize += 2;
     }
 
+    public void turnOnUVLights()
+    {
+        m_internal[m_currIndex++] = (byte)0x10;
+        m_internal[m_currIndex++] = (byte)0x00;
+        m_internal[m_messageCount] += (byte)0x01;
+        m_internal[m_messageSize] += (byte)0x02;
+        m_currentMessageSize += 2;
+    }
+
+    public void turnOffUVLights()
+    {
+        m_internal[m_currIndex++] = (byte)0x11;
+        m_internal[m_currIndex++] = (byte)0x00;
+        m_internal[m_messageCount] += (byte)0x01;
+        m_internal[m_messageSize] += (byte)0x02;
+        m_currentMessageSize += 2;
+    }
+
     public byte[] getMessage()
     {
         byte msg[] = new byte[m_currentMessageSize];
