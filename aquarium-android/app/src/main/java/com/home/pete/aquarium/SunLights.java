@@ -27,6 +27,7 @@ public class SunLights {
     boolean m_uvState;
     boolean m_cloudy;
     int m_lastBrightness;
+    public boolean m_uvEnabledDirectly;
 
     SunLights(Context context)
     {
@@ -36,6 +37,7 @@ public class SunLights {
         m_uvState = false;
         m_cloudy = false;
         m_lastBrightness = 0;
+        m_uvEnabledDirectly = false;
     }
 
     public void endOperation()
@@ -48,6 +50,12 @@ public class SunLights {
     {
         m_sun.setTZOffset(getTZOffset());
         m_handler.postDelayed(periodicUpdate, UPDATE_TIME);
+        MessagePayload msg = new MessagePayload();
+        msg.turnOffUVLights();
+        msg.setStripColor((byte)0, (byte)0, (byte)0);
+        msg.makeFinal();
+        sendMessage(msg);
+        updateFunction(isSunrise(), isSunset());
         Log.d(TAG, "Starting lights program");
     }
 
@@ -100,10 +108,10 @@ public class SunLights {
         return rval;
     }
 
-    private void setLEDColor(int r, int g, int b)
+    private void setStripColor(int r, int g, int b)
     {
         MessagePayload msg = new MessagePayload();
-        msg.setColor((byte)(r & 0xFF), (byte)(g & 0xFF), (byte)(b & 0xFF));
+        msg.setStripColor((byte)(r & 0xFF), (byte)(g & 0xFF), (byte)(b & 0xFF));
         msg.makeFinal();
         sendMessage(msg);
     }
@@ -142,10 +150,10 @@ public class SunLights {
         int sundown = getCalculatedSunset();
 
         if ((now > sunup) && (now < sundown)) {
-            Log.d(TAG, "It's daytime");
+            Log.d(TAG, "It's daytime, sunup is " + sunup + " and sundown is " + sundown);
             return true;
         }
-        Log.d(TAG, "It's nighttime");
+        Log.d(TAG, "It's not daytime");
         return false;
     }
 
@@ -163,8 +171,11 @@ public class SunLights {
         Calendar calendar = new GregorianCalendar();
         int now = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
 
-        if (now >= 1140 && now <= 1320)
+        Log.d(TAG, "now is " + now);
+        if (now >= 1140 && now <= 1320) {
+            Log.d(TAG, "UV is returning true");
             return true;
+        }
 
         return false;
     }
@@ -177,9 +188,31 @@ public class SunLights {
 
     private void turnOnUV()
     {
-        Log.d(TAG, "Turning on the UV strip");
+        if (!m_uvEnabledDirectly) {
+            Log.d(TAG, "Turning on the UV strip");
+            MessagePayload msg = new MessagePayload();
+            msg.turnOnUVLights();
+            msg.makeFinal();
+            sendMessage(msg);
+        }
+    }
+
+    private void turnOffUV()
+    {
+        if (!m_uvEnabledDirectly) {
+            Log.d(TAG, "Turning off the UV strip");
+            MessagePayload msg = new MessagePayload();
+            msg.turnOffUVLights();
+            msg.makeFinal();
+            sendMessage(msg);
+        }
+    }
+
+    private void updateLedStrip()
+    {
+        Log.d(TAG, "Telling LEDs to do what they are told");
         MessagePayload msg = new MessagePayload();
-        msg.turnOnUVLights();
+        msg.updateLEDStrip();
         msg.makeFinal();
         sendMessage(msg);
     }
@@ -191,6 +224,70 @@ public class SunLights {
         LocalBroadcastManager.getInstance(m_context).sendBroadcast(i);
     }
 
+    private void updateFunction(int sunrise, int sunset)
+    {
+        if ((sunrise > 0) && !isDaytime()) {
+            Log.d(TAG, "Running sunrise with offset " + sunrise);
+            setStripColor(255, 255, 255);
+            setLEDBrightness(sunrise * 3);
+            updateLedStrip();
+            m_lastBrightness = sunrise * 3;
+        }
+        else if (isDaytime()) {
+            Log.d(TAG, "Running daytime");
+            if (!m_cloudy) {
+                setStripColor(255, 255, 255);
+                setLEDBrightness(180);
+                updateLedStrip();
+                m_lastBrightness = 180;
+            }
+            else {
+                Random rand = new Random();
+                int value = rand.nextInt(2);
+                if (value == 0) {
+                    value = -3;
+                }
+                else {
+                    value = 3;
+                }
+                if (m_lastBrightness == 120)
+                    value = 3;
+                else if (m_lastBrightness == 150)
+                    value = -3;
+
+                setStripColor(255, 255, 255);
+                setLEDBrightness(m_lastBrightness + value);
+                updateLedStrip();
+                m_lastBrightness += value;
+            }
+        }
+        else if ((sunset > 0) && !isDaytime()) {
+            Log.d(TAG, "Running sunset with offset " + sunset);
+            setStripColor(255, 255, 255);
+            setLEDBrightness(sunset * 3);
+            updateLedStrip();
+            m_lastBrightness = sunset * 3;
+        }
+        else {
+            int moonphase = (int)m_sun.moonPhase();
+            Log.d(TAG, "raw moonphase is " + moonphase);
+            if (moonphase > 14) {
+                moonphase = 29 - moonphase;
+            }
+            Log.d(TAG, "the moon is at position " + moonphase);
+            setStripColor(0, 0, 255);
+            setLEDBrightness((byte)((int)moonphase & 0xFF));
+            updateLedStrip();
+        }
+
+        if (isUVTime()) {
+            turnOnUV();
+        }
+        else {
+            turnOffUV();
+        }
+    }
+
     Runnable periodicUpdate = new Runnable() {
         @Override
         public void run() {
@@ -200,58 +297,7 @@ public class SunLights {
             setDate();
 
             try {
-                if ((sunrise > 0) && !isDaytime()) {
-                    Log.d(TAG, "Running sunrise with offset " + sunrise);
-                    setLEDColor(255, 255, 255);
-                    setLEDBrightness(sunrise * 3);
-                    m_lastBrightness = sunrise * 3;
-                }
-                else if (isDaytime()) {
-                    Log.d(TAG, "Running daytime");
-                    if (!m_cloudy) {
-                        setLEDColor(255, 255, 255);
-                        setLEDBrightness(180);
-                        m_lastBrightness = 180;
-                    }
-                    else {
-                        Random rand = new Random();
-                        int value = rand.nextInt(2);
-                        if (value == 0) {
-                            value = -3;
-                        }
-                        else {
-                            value = 3;
-                        }
-                        if (m_lastBrightness == 120)
-                            value = 3;
-                        else if (m_lastBrightness == 150)
-                            value = -3;
-
-                        setLEDColor(255, 255, 255);
-                        setLEDBrightness(m_lastBrightness + value);
-                        m_lastBrightness += value;
-                    }
-                }
-                else if ((sunset > 0) && !isDaytime()) {
-                    Log.d(TAG, "Running sunset with offset " + sunset);
-                    setLEDColor(255, 255, 255);
-                    setLEDBrightness(180 - (sunset * 3));
-                    m_lastBrightness = 180 - (sunset * 3);
-                }
-                else {
-                    int moonphase = (int)m_sun.moonPhase();
-                    Log.d(TAG, "raw moonphase is " + moonphase);
-                    if (moonphase > 14) {
-                        moonphase = 29 - moonphase;
-                    }
-                    Log.d(TAG, "the moon is at position " + moonphase);
-                    setLEDColor(0, 0, 255);
-                    setLEDBrightness((byte)((int)moonphase & 0xFF));
-                }
-
-                if (isUVTime()) {
-                    turnOnUV();
-                }
+                updateFunction(sunrise, sunset);
             }
             finally {
                 m_handler.postDelayed(periodicUpdate, UPDATE_TIME);

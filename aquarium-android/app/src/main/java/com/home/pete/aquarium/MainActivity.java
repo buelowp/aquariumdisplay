@@ -50,14 +50,14 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Log.d(TAG, "onCreate()");
+//        Log.d(TAG, "onCreate()");
 
         LocalBroadcastManager.getInstance(this).registerReceiver(m_tempLeftReceiver, new IntentFilter("teensy-event-temp-left"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_tempRightReceiver, new IntentFilter("teensy-event-temp-right"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_waterLevelReceiver, new IntentFilter("teensy-event-waterlevel"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_pumpStateReceiver, new IntentFilter("teensy-event-pumpstate"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_heaterStateReceiver, new IntentFilter("teensy-event-heaterstate"));
-        LocalBroadcastManager.getInstance(this).registerReceiver(m_toggleUVStateReceiver, new IntentFilter("teensy-event-uvstate"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(m_UVStateReceiver, new IntentFilter("teensy-event-uvstate"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_helloReceiver, new IntentFilter("teensy-event-hello"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_settingsReceiver, new IntentFilter("settings-event"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_teensyReceiver, new IntentFilter("teensy-event"));
@@ -80,19 +80,19 @@ public class MainActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(TAG, "onStart");
+//        Log.d(TAG, "onStart");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d(TAG, "onStop");
+//        Log.d(TAG, "onStop");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "onDestroy");
+//        Log.d(TAG, "onDestroy");
         m_sunlights.endOperation();
     }
 
@@ -101,7 +101,7 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent)
         {
             byte msg[] = intent.getByteArrayExtra("ACTION");
-            Log.d(TAG, "Lights is asking for: " + Arrays.toString(msg));
+//            Log.d(TAG, "System is asking teensy to do: " + Arrays.toString(msg));
             m_teensy.sendPreformattedMsg(msg);
         }
     };
@@ -121,7 +121,7 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent)
         {
             int msg = intent.getIntExtra("ACTION", 0);
-            Log.d(TAG, "Got hello reponse of: " + msg);
+//            Log.d(TAG, "Got hello reponse of: " + msg);
         }
     };
 
@@ -185,12 +185,12 @@ public class MainActivity extends Activity {
         }
     };
 
-    private BroadcastReceiver m_toggleUVStateReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver m_UVStateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent)
         {
             boolean value = intent.getBooleanExtra("ACTION", false);
-            Log.d(TAG, "Toggling UV state");
+//            Log.d(TAG, "Got a UV state of " + value);
             Intent msg = new Intent("uv-state");
             msg.putExtra("ACTION", value);
             LocalBroadcastManager.getInstance(context).sendBroadcast(msg);
@@ -202,7 +202,7 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent)
         {
             int value = intent.getIntExtra("ACTION", 0);
-            Log.d(TAG, "Updating LED brightness");
+            Log.d(TAG, "Updating LED brightness to " + value);
             Intent msg = new Intent("led-brightness");
             msg.putExtra("ACTION", value);
             LocalBroadcastManager.getInstance(context).sendBroadcast(msg);

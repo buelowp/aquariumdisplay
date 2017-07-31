@@ -43,7 +43,7 @@ public class MessagePayload {
         m_currentMessageSize += 3;
     }
 
-    public void setColor(byte r, byte g, byte b)
+    public void setStripColor(byte r, byte g, byte b)
     {
         m_internal[m_currIndex++] = (byte)0x01;
         m_internal[m_currIndex++] = (byte)0x03;
@@ -55,34 +55,20 @@ public class MessagePayload {
         m_currentMessageSize += 5;
     }
 
-    public void toggleUVState()
+    public void setLedColor(byte i, byte r, byte g, byte b)
     {
-        m_internal[m_currIndex++] = (byte)0x05;
-        m_internal[m_currIndex++] = (byte)0x00;
+        m_internal[m_currIndex++] = (byte)0x015;
+        m_internal[m_currIndex++] = (byte)0x04;
+        m_internal[m_currIndex++] = i;
+        m_internal[m_currIndex++] = r;
+        m_internal[m_currIndex++] = g;
+        m_internal[m_currIndex++] = b;
         m_internal[m_messageCount] += (byte)0x01;
-        m_internal[m_messageSize] += (byte)0x02;
-        m_currentMessageSize += 2;
+        m_internal[m_messageSize] += (byte)0x06;
+        m_currentMessageSize += 6;
     }
 
-    public void enableUVLights()
-    {
-        m_internal[m_currIndex++] = (byte)0x10;
-        m_internal[m_currIndex++] = (byte)0x00;
-        m_internal[m_messageCount] += (byte)0x01;
-        m_internal[m_messageSize] += (byte)0x02;
-        m_currentMessageSize += 2;
-    }
-
-    public void disableUVLights()
-    {
-        m_internal[m_currIndex++] = (byte)0x11;
-        m_internal[m_currIndex++] = (byte)0x00;
-        m_internal[m_messageCount] += (byte)0x01;
-        m_internal[m_messageSize] += (byte)0x02;
-        m_currentMessageSize += 2;
-    }
-
-    public void togglePumpState()
+   public void togglePumpState()
     {
         m_internal[m_currIndex++] = (byte)0x0D;
         m_internal[m_currIndex++] = (byte)0x00;
@@ -138,7 +124,7 @@ public class MessagePayload {
 
     public void powerOffSystem()
     {
-        m_internal[m_currIndex++] = (byte)0x10;
+        m_internal[m_currIndex++] = (byte)0x77;
         m_internal[m_currIndex++] = (byte)0x00;
         m_internal[m_messageCount] += (byte)0x01;
         m_internal[m_messageSize] += (byte)0x02;
@@ -177,8 +163,8 @@ public class MessagePayload {
         m_internal[m_currIndex] = (byte)0xF1;
         m_internal[m_messageSize] += 1;
         m_currentMessageSize++;
-        Log.d(TAG, "Finalizing a message of size " + m_currentMessageSize);
-        Log.d(TAG, "Finalized contents: " + Arrays.toString(getMessage()));
+//        Log.d(TAG, "Finalizing a message of size " + m_currentMessageSize);
+        Log.d(TAG, "Finale message: " + Arrays.toString(getMessage()));
     }
 
     public void getUVState()
@@ -229,6 +215,15 @@ public class MessagePayload {
     public void turnOffUVLights()
     {
         m_internal[m_currIndex++] = (byte)0x11;
+        m_internal[m_currIndex++] = (byte)0x00;
+        m_internal[m_messageCount] += (byte)0x01;
+        m_internal[m_messageSize] += (byte)0x02;
+        m_currentMessageSize += 2;
+    }
+
+    public void updateLEDStrip()
+    {
+        m_internal[m_currIndex++] = (byte)0x14;
         m_internal[m_currIndex++] = (byte)0x00;
         m_internal[m_messageCount] += (byte)0x01;
         m_internal[m_messageSize] += (byte)0x02;

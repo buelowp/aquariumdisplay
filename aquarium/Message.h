@@ -22,7 +22,7 @@ public:
   bool isFinal();
   void printBuffer();
   void clear();
-  void setUVState(uint8_t);
+  void getUVState(uint8_t);
   void setPumpState(uint8_t);
   void setHeaterState(uint8_t);
   void setLEDBrightness(uint8_t);

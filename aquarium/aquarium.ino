@@ -9,7 +9,8 @@
 #define TEMP_PIN            16
 #define PUMP_PIN            3
 #define HEATER_PIN          4
-#define NUM_LEDS            60
+#define NUM_LEDS            10
+#define INDICATOR           7
 
 #define ZERO_VOLUME_RESISTANCE    804.14    // Resistance value (in ohms) when no liquid is present.
 #define CALIBRATION_RESISTANCE    0.00    // Resistance value (in ohms) when liquid is at max line.
@@ -85,7 +86,7 @@ void restartProgram()
   
 }
 
-void setLedColor(byte msg[], int bytes)
+void setLedStripColor(byte msg[], int bytes)
 {
   if (bytes != 3)
     return;
@@ -96,7 +97,21 @@ void setLedColor(byte msg[], int bytes)
     leds[i].g = msg[1];
     leds[i].b = msg[2];
   }
-  FastLED.show();
+}
+
+void setLedColor(byte msg[])
+{
+  Serial.print("Request to set LED ");
+  Serial.print(msg[0]);
+  Serial.print(" to color r=");
+  Serial.print(msg[1]);
+  Serial.print(", g=");
+  Serial.print(msg[2]);
+  Serial.print(", b=");
+  Serial.println(msg[3]);
+  leds[msg[0]].r = msg[1];
+  leds[msg[0]].g = msg[2];
+  leds[msg[0]].b = msg[3];
 }
 
 void setLedBrightness(byte b[], int bytes)
@@ -107,7 +122,6 @@ void setLedBrightness(byte b[], int bytes)
   Serial.print("Request to set LED strip to brightness value ");
   Serial.println(b[0]);
   FastLED.setBrightness(b[0]);
-  FastLED.show();
   g_brightness = (uint8_t)b[0];
   getLightBrightness();
 }
@@ -147,26 +161,19 @@ void getTemps()
   delay(100);
 }
 
-void toggleUV()
-{
-  digitalWrite(UV_PIN, !digitalRead(UV_PIN));
-  Serial.print("Setting UV to state ");
-  Serial.println(digitalRead(UV_PIN));
-  getUVState();
-}
-
 void turnOnUVLights()
 {
-  digitalWrite(UV_PIN, 1);
-  Serial.print("Setting UV to state ");
+  digitalWrite(UV_PIN, 0);
+  Serial.print("Turning on UV lights: ");
   Serial.println(digitalRead(UV_PIN));
   getUVState();
 }
 
 void turnOffUVLights()
 {
-  digitalWrite(UV_PIN, 0);
-  Serial.print("Setting UV to state ");
+  digitalWrite(UV_PIN, 1);
+  delay(50);
+  Serial.print("Turning off UV Lights: ");
   Serial.println(digitalRead(UV_PIN));
   getUVState();
 }
@@ -175,7 +182,7 @@ void getUVState()
 {
   Message msg;
   Serial.println("Getting UV state");
-  msg.setUVState(!digitalRead(UV_PIN));
+  msg.getUVState(!digitalRead(UV_PIN));
   msg.makeFinal();
   msg.printBuffer();
   Serial1.write(msg.getBuffer(), msg.getSize());
@@ -246,7 +253,7 @@ void toggleAllLights()
 {
   Serial.println("Togging all lights");
   toggleSunLights();
-  toggleUV();
+//  toggleUV();
   getUVState();
   getLightBrightness();
   getSunlightState();
@@ -274,6 +281,34 @@ void toggleHeaterState()
   digitalWrite(HEATER_PIN, !digitalRead(HEATER_PIN));  
 }
 
+void executeShow()
+{
+  FastLED.show();
+}
+
+void testLEDS()
+{
+  Serial.println("Testing colors");
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = CRGB::Red;
+  }
+  FastLED.setBrightness(255);
+  FastLED.show();
+  delay(1000);
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = CRGB::Green;
+  }
+  FastLED.setBrightness(255);
+  FastLED.show();
+  delay(1000);
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = CRGB::Blue;
+  }
+  FastLED.setBrightness(255);
+  FastLED.show();
+  delay(1000);
+}
+
 void parseThingsMsg(byte msg[])
 {
   int index = 3;
@@ -281,8 +316,6 @@ void parseThingsMsg(byte msg[])
   int numMessages = msg[2];
   
   if (msg[0] == 0xF0) {
-    Serial.print("This message is sized: ");
-    Serial.println(msg[1]);
     Serial.print("There are ");
     Serial.print(numMessages);
     Serial.println(" messages inside");
@@ -307,7 +340,7 @@ void parseThingsMsg(byte msg[])
           shutdownDevice();
           break;
         case 0x01:
-          setLedColor(contents, msgSize);
+          setLedStripColor(contents, msgSize);
           break;
         case 0x02:
           setLedBrightness(contents, msgSize);
@@ -319,7 +352,8 @@ void parseThingsMsg(byte msg[])
           getTemps();
           break;
         case 0x05:
-          toggleUV();
+          Serial.println("Someone asked to toggle the UV lights");
+//          toggleUV();
           break;
         case 0x06:
           restartProgram();
@@ -360,6 +394,11 @@ void parseThingsMsg(byte msg[])
         case 0x13:
           getRGBValues();
           break;
+        case 0x14:
+          executeShow();
+          break;
+        case 0x15:
+          setLedColor(contents);
         default:
           Serial.println("Unknown message");
           for (int i = 0; i < 10; i++) {
@@ -377,20 +416,34 @@ void parseThingsMsg(byte msg[])
   }
 }
 
+void clearStrip()
+{
+  Serial.println("Setting all pins to black");
+  for (int i = 144; i < 0; i++) {
+    leds[i] = CRGB::Black;
+  }
+  FastLED.setBrightness(0);
+  FastLED.show();
+}
+
 void setup() 
 {
   Serial.begin(115200);
   Serial1.begin(115200);
+  delay(3000);
   pinMode(UV_PIN, OUTPUT);
-  pinMode(7, OUTPUT);
-  digitalWrite(7, 1);
+  pinMode(INDICATOR, OUTPUT);
+  digitalWrite(INDICATOR, 1);
   digitalWrite(UV_PIN, 1);
   digitalWrite(PUMP_PIN, 1);
   sensors.begin();
-  FastLED.addLeds<APA102>(leds, NUM_LEDS);
+  FastLED.addLeds<APA102,11,13,BGR>(leds,NUM_LEDS);
   msgIndex = 0;
   g_brightness = 250;
   g_lights = false;
+  clearStrip();
+  testLEDS();
+  clearStrip();
 }
 
 void loop() 

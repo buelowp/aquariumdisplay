@@ -102,7 +102,7 @@ void Message::setTemps(uint8_t *left, int len_left, uint8_t *right, int len_righ
   }
 }
 
-void Message::setUVState(uint8_t state)
+void Message::getUVState(uint8_t state)
 {
   m_internal[m_currIndex++] = 7;
   m_internal[m_currIndex++] = 1;

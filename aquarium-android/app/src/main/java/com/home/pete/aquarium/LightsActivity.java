@@ -17,12 +17,15 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class LightsActivity extends Activity {
     private static final String TAG = LightsActivity.class.getSimpleName();
     private static final double LATITUDE = 42.058102;
     private static final double LONGITUDE = 87.984189;
     private static final int VIEW_TIMEOUT = 1000 * 60;
+    private static final int UV_STRIP_TIMEOUT = 1000 * 60 * 60;
 
     private Handler handler = new Handler();
     private GestureDetector m_gd;
@@ -36,6 +39,9 @@ public class LightsActivity extends Activity {
     private SeekBar m_sbBrightness;
     private Context m_context;
 
+    private boolean m_uvEnabledDirectly;
+    Timer uvStripTimeout = new Timer();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +49,7 @@ public class LightsActivity extends Activity {
 
         m_gd = new GestureDetector(this, new LightsActivity.MyGestureListener());
         m_context = this;
+        m_uvEnabledDirectly = false;
 
         Calendar date = Calendar.getInstance();
         m_sun.setCurrentDate(date.get(date.YEAR), date.get(date.MONTH) + 1, date.get(date.DAY_OF_MONTH));
@@ -136,15 +143,52 @@ public class LightsActivity extends Activity {
         handler.postDelayed(finalizer, VIEW_TIMEOUT);
     }
 
-    public void toggleUV(View view) {
-        handler.removeCallbacks(finalizer);
+    public void turnOffUVStrip()
+    {
         MessagePayload msg = new MessagePayload();
-        msg.toggleUVState();
+        msg.turnOffUVLights();
         msg.makeFinal();
 
         Intent i = new Intent("teensy-event");
         i.putExtra("ACTION", msg.getMessage());
         LocalBroadcastManager.getInstance(this).sendBroadcast(i);
+    }
+
+    public void turnOnUVStrip()
+    {
+        MessagePayload msg = new MessagePayload();
+        msg.turnOnUVLights();
+        msg.makeFinal();
+
+        Intent i = new Intent("teensy-event");
+        i.putExtra("ACTION", msg.getMessage());
+        LocalBroadcastManager.getInstance(this).sendBroadcast(i);
+    }
+
+    public void toggleUV(View view) {
+        handler.removeCallbacks(finalizer);
+        if (tbUVState.isChecked()) {
+            m_uvEnabledDirectly = false;
+            m_sunlights.m_uvEnabledDirectly = false;
+            turnOffUVStrip();
+            uvStripTimeout.cancel();
+        }
+        else {
+            m_uvEnabledDirectly = true;
+            m_sunlights.m_uvEnabledDirectly = true;
+            turnOnUVStrip();
+            uvStripTimeout.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run()
+                {
+                    if (m_uvEnabledDirectly) {
+                        turnOffUVStrip();
+                        m_uvEnabledDirectly = false;
+                        m_sunlights.m_uvEnabledDirectly = false;
+                    }
+                }
+            },0, UV_STRIP_TIMEOUT);
+        }
         handler.postDelayed(finalizer, VIEW_TIMEOUT);
     }
 
@@ -170,7 +214,7 @@ public class LightsActivity extends Activity {
 
     public void setToBrightSunlight(View view) {
         MessagePayload msg = new MessagePayload();
-        msg.setColor((byte)0xFF, (byte)0xFF, (byte)0xFF);
+        msg.setStripColor((byte)0xFF, (byte)0xFF, (byte)0xFF);
         msg.setBrightness((byte)0xF0);
         msg.makeFinal();
 
@@ -185,7 +229,7 @@ public class LightsActivity extends Activity {
         m_sun.setCurrentDate(date.get(date.YEAR), date.get(date.MONTH) + 1, date.get(date.DAY_OF_MONTH));
         m_sun.setTZOffset(-5);
 
-        msg.setColor((byte)0x00, (byte)0xBF, (byte)0xFF);
+        msg.setStripColor((byte)0x00, (byte)0xBF, (byte)0xFF);
         msg.setBrightness((byte)m_sun.moonPhase(date.getTimeInMillis()));
         msg.makeFinal();
 
@@ -196,7 +240,7 @@ public class LightsActivity extends Activity {
 
     public void setToCloudyLight(View view) {
         MessagePayload msg = new MessagePayload();
-        msg.setColor((byte)0xFF, (byte)0xFF, (byte)0xFF);
+        msg.setStripColor((byte)0xFF, (byte)0xFF, (byte)0xFF);
         msg.setBrightness((byte)0x96);
         msg.makeFinal();
 
@@ -207,7 +251,7 @@ public class LightsActivity extends Activity {
 
     public void setToSunset(View view) {
         MessagePayload msg = new MessagePayload();
-        msg.setColor((byte)0xFF, (byte)0x7F, (byte)0x50);
+        msg.setStripColor((byte)0xFF, (byte)0x7F, (byte)0x50);
         msg.makeFinal();
 
         Intent i = new Intent("teensy-event");
