@@ -17,6 +17,7 @@ import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
+
 /**
  * Skeleton of an Android Things activity.
  * <p>
@@ -65,8 +66,8 @@ public class MainActivity extends Activity {
         m_webview = new Intent(this, WebviewActivity.class);
         m_lights = new Intent(this, LightsActivity.class);
 
-        if (!m_teensy.m_helloReceived)
-            m_teensy.sendHello();
+//        if (!m_teensy.m_helloReceived)
+        m_teensy.sendHello();
     }
 
     @Override

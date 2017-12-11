@@ -27,7 +27,6 @@ public class SettingsActivity extends Activity {
     private static final double LATITUDE = 42.058102;
     private static final double LONGITUDE = 87.984189;
     private static final int VIEW_TIMEOUT = 1000 * 60;
-    PeripheralManagerService service = new PeripheralManagerService();
 
     private Handler handler = new Handler();
     private GestureDetector m_gd;
@@ -53,20 +52,20 @@ public class SettingsActivity extends Activity {
 
         m_gd = new GestureDetector(this, new SettingsActivity.MyGestureListener());
         Calendar date = Calendar.getInstance();
-        m_sun.setCurrentDate(date.get(date.YEAR), date.get(date.MONTH) + 1, date.get(date.DAY_OF_MONTH));
+        m_sun.setCurrentDate(date.get(Calendar.YEAR), date.get(Calendar.MONTH) + 1, date.get(Calendar.DAY_OF_MONTH));
         m_sun.setTZOffset(-5);
 
-        m_leftTemp = (TextView) findViewById(R.id.textView_TempLeft);
-        m_rightTemp = (TextView) findViewById(R.id.textView_TempRight);
-        m_waterLevel = (TextView) findViewById(R.id.textView_WaterLevel);
-        m_sunrise = (TextView) findViewById(R.id.textView_sunrise_value);
-        m_sunset = (TextView) findViewById(R.id.textView_sunset_value);
-        m_moonphase = (TextView) findViewById(R.id.textView_moonphase_value);
-        m_pumpState = (ToggleButton)findViewById(R.id.toggle_PumpState);
-        m_heaterState = (ToggleButton)findViewById(R.id.toggle_HeaterState);
-        m_systemState = (ToggleButton)findViewById(R.id.toggle_LightState);
-        m_waterChange = (Button)findViewById(R.id.button_ChangeWater);
-        m_filterChange = (Button)findViewById(R.id.button_changeFilter);
+        m_leftTemp = findViewById(R.id.textView_TempLeft);
+        m_rightTemp = findViewById(R.id.textView_TempRight);
+        m_waterLevel = findViewById(R.id.textView_WaterLevel);
+        m_sunrise = findViewById(R.id.textView_sunrise_value);
+        m_sunset = findViewById(R.id.textView_sunset_value);
+        m_moonphase = findViewById(R.id.textView_moonphase_value);
+        m_pumpState = findViewById(R.id.toggle_PumpState);
+        m_heaterState = findViewById(R.id.toggle_HeaterState);
+        m_systemState = findViewById(R.id.toggle_LightState);
+        m_waterChange = findViewById(R.id.button_ChangeWater);
+        m_filterChange = findViewById(R.id.button_changeFilter);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(m_heaterStateMessage, new IntentFilter("heater-state"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_pumpStateMessage, new IntentFilter("pump-state"));
@@ -154,17 +153,15 @@ public class SettingsActivity extends Activity {
         int sunsetMin = (int)sunset % 60;
 
         m_moonphase.setText(String.valueOf(m_sun.moonPhase()));
-        StringBuilder sbSunrise = new StringBuilder();
-        sbSunrise.append(sunriseHour);
-        sbSunrise.append(":");
-        sbSunrise.append(sunriseMin);
-        sbSunrise.append(" AM");
-        m_sunrise.setText(sbSunrise.toString());
-        StringBuilder sbSunset = new StringBuilder();
-        sbSunset.append(sunsetHour);
-        sbSunset.append(":");
-        sbSunset.append(sunsetMin);
-        sbSunset.append(" PM");
+        String sbSunrise = String.valueOf(sunriseHour) +
+                ":" +
+                sunriseMin +
+                " AM";
+        m_sunrise.setText(sbSunrise);
+        String sbSunset = String.valueOf(sunsetHour) +
+                ":" +
+                sunsetMin +
+                " PM";
         m_sunset.setText(sbSunset);
 
         TimeZone tz = date.getTimeZone();
