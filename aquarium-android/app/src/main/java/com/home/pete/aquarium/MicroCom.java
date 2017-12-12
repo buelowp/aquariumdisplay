@@ -20,11 +20,13 @@ public class MicroCom {
 
     private UartDevice m_device;
     private Context m_context;
+    public boolean m_helloReceived;
 
     MicroCom(Context context)
     {
         PeripheralManagerService m_manager = new PeripheralManagerService();
         m_context = context;
+        m_helloReceived = false;
         try {
             m_device = m_manager.openUartDevice(DEV_NAME);
             m_device.registerUartDeviceCallback(mUartCallback);
@@ -61,7 +63,7 @@ public class MicroCom {
 
     public void sendLedColor(byte r, byte g, byte b) {
         MessagePayload msg = new MessagePayload();
-        msg.setColor(r, g, b);
+        msg.setStripColor(r, g, b);
         msg.makeFinal();
 
         try {
@@ -111,19 +113,6 @@ public class MicroCom {
         }
     }
 
-    public void toggleUV() {
-        MessagePayload msg = new MessagePayload();
-        msg.toggleUVState();
-        msg.makeFinal();
-
-        try {
-            writeData(msg.getMessage());
-        }
-        catch (IOException e) {
-            Log.e(TAG, e.getMessage());
-        }
-    }
-
     void sendPreformattedMsg(byte[] msg) {
         try {
             writeData(msg);
@@ -141,7 +130,6 @@ public class MicroCom {
     }
 
     private void writeData(byte[] buf) throws IOException {
-        Log.d(TAG, "Sending: " + Arrays.toString(buf));
         m_device.write(buf, buf.length);
     }
 
@@ -151,16 +139,16 @@ public class MicroCom {
             int msgCount = buf[2];
             int index = 3;
 
-            Log.d(TAG, "Got message of size " + msgSize + ", with " + msgCount + " messages inside");
-            Log.d(TAG, "Checking message id " + (buf[index] & 0xFF) + " at index " + index);
+            Log.d(TAG, "Checking incoming message id 0x" + Integer.toHexString((int)(buf[index] & 0xFF)) + " at index " + index);
             for (int i = 0; i < msgCount; i++) {
                 switch ((buf[index++] & 0xFF)) {
                     case 0xAA: {
                         Intent msg = new Intent("teensy-event-hello");
                         msg.putExtra("ACTION", 1);
-                        Log.d(TAG, "Got a handshake reponse");
+//                        Log.d(TAG, "Got a handshake reponse");
                         LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
                         index++;
+                        m_helloReceived = true;
                         break;
                     }
                     case 0x03: {
@@ -208,11 +196,13 @@ public class MicroCom {
                         break;
                     }
                     case 0x07: {
+                        // Note that as wired, 0 is ON, 1 is off for the UV switch right now
+                        // This is handled on the Teensy directly, but is here for reference
                         index++;
-                        boolean state = !((buf[index++] & 0xFF) == 0);
+                        boolean state = ((buf[index++] & 0xFF) == 1);
+                        Log.d(TAG, "Teensy says the UV lights are " + state);
                         Intent msg = new Intent("teensy-event-uvstate");
                         msg.putExtra("ACTION", state);
-                        Log.d(TAG, "Got UV state of " + state);
                         LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
                         break;
                     }
@@ -239,7 +229,28 @@ public class MicroCom {
                         int state = buf[index++] & 0xFF;
                         Intent msg = new Intent("teensy-event-brightness");
                         msg.putExtra("ACTION", state);
-                        Log.d(TAG, "Got an LED brightness of " + state);
+//                        Log.d(TAG, "Got an LED brightness of " + state);
+                        LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
+                        break;
+                    }
+                    case 0x0A: {
+                        index++;
+                        boolean state = !((buf[index++] & 0xFF) == 0);
+                        Intent msg = new Intent("teensy-event-primary-light-state");
+                        msg.putExtra("ACTION", state);
+//                        Log.d(TAG, "Got a primary light state of " + state);
+                        LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
+                        break;
+                    }
+                    case 0x13: {
+                        int[] colors = new int[3];
+                        index++;
+                        colors[0] = buf[index++] & 0xFF;
+                        colors[1] = buf[index++] & 0xFF;
+                        colors[2] = buf[index++] & 0xFF;
+                        Intent msg = new Intent("teensy-event-rgb");
+                        msg.putExtra("ACTION", colors);
+//                        Log.d(TAG, "Got an RGB response of " + colors);
                         LocalBroadcastManager.getInstance(m_context).sendBroadcast(msg);
                         break;
                     }

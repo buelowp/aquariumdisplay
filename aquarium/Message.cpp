@@ -102,7 +102,7 @@ void Message::setTemps(uint8_t *left, int len_left, uint8_t *right, int len_righ
   }
 }
 
-void Message::setUVState(uint8_t state)
+void Message::getUVState(uint8_t state)
 {
   m_internal[m_currIndex++] = 7;
   m_internal[m_currIndex++] = 1;
@@ -136,6 +136,25 @@ void Message::setLEDBrightness(uint8_t value)
   m_internal[m_currIndex++] = value;
   m_internal[INDEX_MSG_COUNT] += 1;
   m_internal[INDEX_MSG_SIZE] += 3;
+}
 
+void Message::setPrimaryLightState(uint8_t value)
+{
+  m_internal[m_currIndex++] = 10;
+  m_internal[m_currIndex++] = 1;
+  m_internal[m_currIndex++] = value;
+  m_internal[INDEX_MSG_COUNT] += 1;
+  m_internal[INDEX_MSG_SIZE] += 3;
+}
+
+void Message::setRGBValues(CRGB c)
+{
+  m_internal[m_currIndex++] = 13;
+  m_internal[m_currIndex++] = 1;
+  m_internal[m_currIndex++] = c.r;
+  m_internal[m_currIndex++] = c.g;
+  m_internal[m_currIndex++] = c.b;
+  m_internal[INDEX_MSG_COUNT] += 1;
+  m_internal[INDEX_MSG_SIZE] += 5;  
 }
 

@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <stdint.h>
+#include <FastLED.h>
 
 #define INDEX_MSG_SIZE  1
 #define INDEX_MSG_COUNT 2
@@ -21,10 +22,12 @@ public:
   bool isFinal();
   void printBuffer();
   void clear();
-  void setUVState(uint8_t);
+  void getUVState(uint8_t);
   void setPumpState(uint8_t);
   void setHeaterState(uint8_t);
   void setLEDBrightness(uint8_t);
+  void setPrimaryLightState(uint8_t);
+  void setRGBValues(CRGB c);
 
 private:
   uint8_t m_internal[128];

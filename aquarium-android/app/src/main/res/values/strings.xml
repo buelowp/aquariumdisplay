@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Aquarium</string>
-    <string name="title_activity_webview">See the Fish</string>
-    <string name="title_activity_settings">Manage Settings</string>
-    <string name="title_activity_lightsview">Manage the Lights</string>
+    <string name="title_activity_webview">Meet The Fish</string>
+    <string name="title_activity_settings">Manage The Tank</string>
+    <string name="title_activity_lightsview">Manage The Lights</string>
     <string name="button_title_moon">Moon Light</string>
     <string name="button_title_sunset">Sunset</string>
     <string name="button_title_brightsun">Bright Sun</string>
@@ -24,4 +24,10 @@
     <string name="button_change_water">Change the Water</string>
     <string name="textview_water_level_string">Water Level</string>
     <string name="button_change_the_filter">Change the Filter</string>
+    <string name="togglebutton_cloudy">Cloudy</string>
+    <string name="togglebutton_sunny">Sunny</string>
+    <string name="textview_text_color">LED Color (RGB)</string>
+    <string name="textview_red">Red</string>
+    <string name="textview_green">Green</string>
+    <string name="textview_blue">Blue</string>
 </resources>
