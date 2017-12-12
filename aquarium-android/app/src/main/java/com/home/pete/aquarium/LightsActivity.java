@@ -40,13 +40,13 @@ public class LightsActivity extends Activity {
         m_context = this;
 
         Calendar date = Calendar.getInstance();
-        m_sun.setCurrentDate(date.get(date.YEAR), date.get(date.MONTH) + 1, date.get(date.DAY_OF_MONTH));
+        m_sun.setCurrentDate(date.get(Calendar.YEAR), date.get(Calendar.MONTH) + 1, date.get(Calendar.DAY_OF_MONTH));
 
         LocalBroadcastManager.getInstance(this).registerReceiver(m_uvStateReceiver, new IntentFilter("uv-state"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_ledBrightnessReceiver, new IntentFilter("led-brightness"));
-        tbUVState = (ToggleButton)findViewById(R.id.toggleButton_UVLights);
+        tbUVState = findViewById(R.id.toggleButton_UVLights);
 
-        m_sbBrightness = (SeekBar)findViewById(R.id.seekBar_brightness);
+        m_sbBrightness = findViewById(R.id.seekBar_brightness);
         m_sbBrightness.setMax(255);
         m_sbBrightness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int progressChanged = 0;

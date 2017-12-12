@@ -3,7 +3,6 @@ package com.home.pete.aquarium;
 import android.os.Bundle;
 import android.app.Activity;
 
-import com.google.android.things.pio.*;
 import android.content.*;
 
 import android.os.Handler;
@@ -15,8 +14,6 @@ import android.widget.TextView;
 import android.util.Log;
 
 import java.util.TimeZone;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.Calendar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.ToggleButton;
@@ -30,8 +27,6 @@ public class SettingsActivity extends Activity {
 
     private Handler handler = new Handler();
     private GestureDetector m_gd;
-    private Timer t;
-    private TimerTask task;
     private Sunposition m_sun = new Sunposition(LATITUDE, LONGITUDE, -5);
     TextView m_leftTemp;
     TextView m_rightTemp;
@@ -168,7 +163,7 @@ public class SettingsActivity extends Activity {
 
         // print the time zone name for this calendar
         Log.d(TAG, "The time zone is: " + tz.getDisplayName());
-        Log.d(TAG, "Timezone offset is: " + tz.getRawOffset());
+        Log.d(TAG, "Timezone offset is: " + tz.getRawOffset() / 1000 / 60 / 60);
 
     }
 

@@ -1,21 +1,19 @@
 package com.home.pete.aquarium;
 
 import android.app.Activity;
-import android.app.AlarmManager;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.content.*;
-import com.google.android.things.pio.Gpio;
-import com.google.android.things.pio.PeripheralManagerService;
-import android.support.v4.content.LocalBroadcastManager;
-import android.widget.TextView;
 
-import java.io.IOException;
+import com.google.android.things.device.TimeManager;
+import android.support.v4.content.LocalBroadcastManager;
+import android.os.Handler;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Timer;
-import java.util.TimerTask;
+import android.icu.util.Calendar;
+import android.icu.util.TimeZone;
 
 
 /**
@@ -40,16 +38,29 @@ import java.util.TimerTask;
 public class MainActivity extends Activity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private static final double LATITUDE = 42.058102;
+    private static final double LONGITUDE = 87.984189;
+
     private Intent m_settings;
     private Intent m_webview;
     private Intent m_lights;
-    private MicroCom m_teensy = new MicroCom(this);
+    private MicroCom m_teensy;
+
+    TimeManager m_timeManager;
+    Sunposition m_sun = new Sunposition(LATITUDE, LONGITUDE, -5);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate()");
+        final Handler m_updateLighting;
+
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        Log.d(TAG, "X = " + size.x);
+        Log.d(TAG, "Y = " + size.y);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(m_tempLeftReceiver, new IntentFilter("teensy-event-temp-left"));
         LocalBroadcastManager.getInstance(this).registerReceiver(m_tempRightReceiver, new IntentFilter("teensy-event-temp-right"));
@@ -65,9 +76,32 @@ public class MainActivity extends Activity {
         m_settings = new Intent(this, SettingsActivity.class);
         m_webview = new Intent(this, WebviewActivity.class);
         m_lights = new Intent(this, LightsActivity.class);
+        m_teensy = new MicroCom(this);
+        m_timeManager = new TimeManager();
 
-//        if (!m_teensy.m_helloReceived)
-        m_teensy.sendHello();
+        try {
+            m_timeManager.setAutoTimeEnabled(true);
+            m_timeManager.setTimeZone("America/Chicago");
+        }
+        catch (RuntimeException e) {
+            Log.e(TAG, "Time service not available: " + e.getMessage());
+            e.printStackTrace(System.err);
+        }
+
+        m_updateLighting = new Handler();
+        m_updateLighting.postDelayed(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Calendar date = Calendar.getInstance();
+                TimeZone tz = date.getTimeZone();
+                m_sun.setCurrentDate(date.get(Calendar.YEAR), date.get(Calendar.MONTH) + 1, date.get(Calendar.DAY_OF_MONTH));
+                m_sun.setTZOffset(tz.getRawOffset() / 1000 / 60 / 60);
+                Log.d(TAG, "Setting timezone to: " + tz.getRawOffset() / 1000 / 60 / 60);
+                m_updateLighting.postDelayed(this, 1000 * 60);
+            }
+        }, 1000 * 60);
     }
 
     @Override
@@ -214,5 +248,21 @@ public class MainActivity extends Activity {
     public void viewLights(View view) {
         Log.d(TAG, "Managing the lights");
         startActivity(m_lights);
+    }
+
+    private boolean isDaytime()
+    {
+        double sunrise = m_sun.calcSunrise();
+        Calendar now = Calendar.getInstance();
+        long minsPastMidnight = now.getTimeInMillis() / 1000 / 60;
+
+        return false;
+    }
+
+    private boolean isSunrise() {
+        double sunrise = m_sun.calcSunrise();
+        Calendar now = Calendar.getInstance();
+        long minsPastMidnight = now.getTimeInMillis() / 1000 / 60;
+        return false;
     }
 }
