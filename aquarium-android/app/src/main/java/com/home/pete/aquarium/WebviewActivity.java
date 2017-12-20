@@ -15,10 +15,8 @@ import java.util.List;
 
 public class WebviewActivity extends Activity {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = WebviewActivity.class.getSimpleName();
     private Context m_context;
-//    private GestureDetector m_gd;
-//    WebView myWebView;
     MyWebView myWebView;
 
     @Override
@@ -27,21 +25,19 @@ public class WebviewActivity extends Activity {
         setContentView(R.layout.activity_webview);
 
         Log.d(TAG, "Getting started");
-        WebView webview = findViewById(R.id.webview);
-        webview.setWebViewClient(new WebViewClient());
-        myWebView = new MyWebView(webview.getContext());
+        myWebView = new MyWebView(WebviewActivity.this, this);
         Log.d(TAG, "Set web view client");
 
-        this.m_context = m_context;
+//        this.m_context = m_context;
 //        m_gd = new GestureDetector(myWebView.getContext(), this);
 //        m_gd.setOnDoubleTapListener(this);
-        webview.loadUrl("https://en.wikipedia.org/wiki/Neon_tetra");
+//        webview.loadUrl("https://en.wikipedia.org/wiki/Dwarf_gourami");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         Log.d(TAG, "onStart");
-//        myWebView.loadUrl();
+        myWebView.loadUrl(0);
     }
 }
