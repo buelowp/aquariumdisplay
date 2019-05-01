@@ -1,4 +1,0 @@
-(fp_lib_table
-  (lib (name project_footprints)(type KiCad)(uri "$(KIPRJMOD)/project_footprints.pretty")(options "")(descr ""))
-  (lib (name teensy)(type KiCad)(uri /Users/pete/Projects/kicad/teensy.pretty)(options "")(descr ""))
-)

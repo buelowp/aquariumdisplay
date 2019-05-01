@@ -18,3 +18,4 @@ ftp-lib-table
 /android/build
 /android/captures
 .externalNativeBuild
+/app/build
