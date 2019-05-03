@@ -14,7 +14,10 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -41,11 +44,12 @@ import java.util.Date;
 public class DataviewActivity extends Activity {
     private static final String TAG = DataviewActivity.class.getSimpleName();
 
-    private IMqttClient client;
+    IMqttClient client;
 
     TextView m_temperature;
     TextView m_level;
     Button m_dateChange;
+    boolean m_success;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,28 +57,34 @@ public class DataviewActivity extends Activity {
         setContentView(R.layout.activity_dataview);
 
         try {
-            client = new MqttClient(Constants.MQTT_BROKER_URL, Constants.CLIENT_ID);
+            client = new MqttClient(Constants.MQTT_BROKER_URL, Constants.CLIENT_ID, new MemoryPersistence());
+            m_success = true;
+            Log.d(TAG, "Able to create a new client");
         }
         catch (MqttException e) {
-            Log.e(TAG, e.toString());
+            Log.e(TAG, "Error creating new MQTT client: " + e.toString());
+            Log.e(TAG, "Reason Code:" + e.getReasonCode());
+            m_success = false;
         }
 
-        MqttConnectOptions options = new MqttConnectOptions();
-        options.setCleanSession(true);
-        options.setConnectionTimeout(10);
-        client.setCallback(new SimpleMqttCallBack());
+        if (m_success) {
+            MqttConnectOptions options = new MqttConnectOptions();
+            options.setCleanSession(true);
+            options.setConnectionTimeout(60);
 
-        try {
-            client.connect(options);
-            client.subscribe("aquarium/#");
-        }
-        catch (MqttException e) {
-            Log.e(TAG, e.toString());
+            try {
+                client.connect(options);
+                client.subscribe("aquarium/#");
+            } catch (MqttException e) {
+                Log.e(TAG, e.toString());
+            }
+            client.setCallback(new SimpleMqttCallBack());
         }
 
-        m_temperature = findViewById(R.id.tempTextView);
-        m_level = findViewById(R.id.waterLevelTextView);
+        m_temperature = findViewById(R.id.tempValue);
+        m_level = findViewById(R.id.levelValue);
         m_dateChange = findViewById(R.id.buttonDateChange);
+        m_temperature.setText("Other");
     }
 
     @Override
@@ -88,19 +98,33 @@ public class DataviewActivity extends Activity {
         super.onDestroy();
     }
 
-    public class SimpleMqttCallBack implements MqttCallback {
+    public class SimpleMqttCallBack implements MqttCallback
+    {
         public void connectionLost(Throwable throwable) {
-            System.out.println("Connection to MQTT broker lost!");
+            Log.e(TAG, "Connection to MQTT broker lost!");
+            MqttConnectOptions options = new MqttConnectOptions();
+            options.setCleanSession(true);
+            options.setConnectionTimeout(10);
+            try {
+                client.connect(options);
+                client.subscribe("aquarium/#");
+            } catch (MqttException e) {
+                Log.e(TAG, e.toString());
+            }
+//            client.setCallback(new SimpleMqttCallBack());
+            Log.d(TAG, "MQTT reconnect attempt");
         }
 
         public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
             if (s.equals("aquarium/temperature")) {
-                byte[] p = mqttMessage.getPayload();
-                m_temperature.setText(p.toString());
+                Double value = new Double(new String(mqttMessage.getPayload()));
+                String result = value.toString();
+//                Log.d(TAG, result);
+                m_temperature.setText(result);
             }
             if (s.equals("aquarium/waterlevel")) {
                 byte[] p = mqttMessage.getPayload();
-                m_level.setText(p.toString());
+                m_level.setText("Other Text");
             }
         }
 

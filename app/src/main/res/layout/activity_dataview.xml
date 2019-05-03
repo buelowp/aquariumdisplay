@@ -10,94 +10,101 @@
 
     <TextView
         android:id="@+id/tempTextView"
-        android:layout_width="250dp"
+        android:layout_width="200px"
         android:layout_height="wrap_content"
-        android:layout_marginStart="80dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
         android:background="@android:color/background_dark"
         android:fontFamily="sans-serif"
+        android:gravity="right"
         android:text="@string/temperature"
-        android:textAlignment="center"
         android:textColor="@android:color/white"
-        android:textSize="36sp"
+        android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/waterLevelTextView"
-        android:layout_width="250dp"
+        android:layout_width="200px"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
-        android:layout_marginEnd="80dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
         android:background="@android:color/background_dark"
         android:fontFamily="sans-serif"
-        android:textAlignment="center"
+        android:gravity="right"
+        android:text="@string/Waterlevel"
         android:textColor="@android:color/white"
-        android:textSize="36sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="@string/Waterlevel" />
-
-    <TextView
-        android:id="@+id/tempValue"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="80dp"
-        android:layout_marginTop="32dp"
-        android:background="@android:color/background_dark"
-        android:textAlignment="center"
-        android:textColor="@android:color/white"
-        android:textSize="36sp"
+        android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tempTextView" />
 
     <TextView
-        android:id="@+id/levelValue"
-        android:layout_width="250dp"
+        android:id="@+id/tempValue"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="80dp"
         android:background="@android:color/background_dark"
-        android:textAlignment="center"
+        android:gravity="center"
         android:textColor="@android:color/white"
-        android:textSize="36sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/waterLevelTextView" />
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@+id/tempTextView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/levelValue"
+        android:layout_width="50px"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/background_dark"
+        android:contentDescription="Input value for water level"
+        android:fontFamily="sans-serif"
+        android:gravity="left"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@+id/waterLevelTextView"
+        app:layout_constraintTop_toBottomOf="@+id/tempValue" />
 
     <TextView
         android:id="@+id/waterChange"
-        android:layout_width="250dp"
-        android:layout_height="110dp"
-        android:layout_marginStart="80dp"
-        android:layout_marginTop="32dp"
+        android:layout_width="200px"
+        android:layout_height="0dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
         android:contentDescription="Display last water change date"
-        android:textAlignment="center"
-        android:textSize="36sp"
+        android:fontFamily="sans-serif"
+        android:gravity="right"
+        android:text="@string/waterchange"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tempValue"
-        tools:text="@string/waterchange" />
+        app:layout_constraintTop_toBottomOf="@+id/waterLevelTextView" />
 
     <Button
         android:id="@+id/buttonDateChange"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_width="200px"
+        android:layout_height="50px"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/background_dark"
+        android:gravity="left"
         android:onClick="setWaterChangeDate"
-        android:textAlignment="center"
-        android:textSize="36sp"
-        app:layout_constraintTop_toBottomOf="@+id/waterChange"
-        tools:layout_editor_absoluteX="80dp" />
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@+id/waterChange"
+        app:layout_constraintTop_toBottomOf="@+id/levelValue" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/exitButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="80dp"
+        android:layout_marginEnd="32dp"
         android:layout_marginBottom="32dp"
+        android:gravity="center"
         android:onClick="exitView"
-        android:textSize="36sp"
+        android:text="@string/exitdataview"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:text="@string/exitdataview" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
