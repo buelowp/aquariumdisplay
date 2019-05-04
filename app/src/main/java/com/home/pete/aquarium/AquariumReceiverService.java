@@ -36,39 +36,22 @@ public class AquariumReceiverService extends Service implements MqttCallback {
     private static final int CONNECTION_TIMEOUT = 15;
     private static final int QOS = 2;
 
-    private static final String TAG = "PushService";
+    private static final String TAG = AquariumReceiverService.class.getSimpleName();
 
-    //Timers
-    private static java.util.Timer statusTimer;
-    private static java.util.Timer heartbeatTimer;
+    private MqttClient m_client = null;
+    private MqttConnectOptions m_options;
+    private String m_server;
+    private List<String> m_topics;
+    private int[] m_qos;
+    private String m_clientId = AquariumReceiverService.class.getSimpleName();
+    private MemoryPersistence m_dataStore;
 
+    private Notification m_notification = new Notification();
 
-    private MqttClient client = null;
-    private MqttConnectOptions conOpt;
-    private String brokerUrl;
-    private List<String> topics;
-    private static String clientId = "LF";
-    private static String facilityId;
-    private String equipmentId;
-    private int[] qos;
-    private MemoryPersistence dataStore;
-    private String userAgent = "";
-    private boolean isConnectedToLive = true;
-    private static String deviceType = "";
-    private String status = "Idle";
-    private String userId = "Anonymous";
-
-    private Notification notification = new Notification();
-
-    /**
-     * True if service has been initialized once.
-     * False otherwise.
-     */
-    public boolean initialized = false;
+    public boolean m_initialized = false;
 
     Thread serviceHeartBeatThread;
-    private String initializedDate;
-    private boolean contServerHB = true;
+    private boolean m_continueHeartBeat = true;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -87,9 +70,9 @@ public class AquariumReceiverService extends Service implements MqttCallback {
         Log.i(TAG, "onCreate");
 
         // always foreground
-        startForeground(5131, notification);
+        startForeground(5131, m_notification);
 
-        topics = new ArrayList<String>();
+        m_topics = new ArrayList<String>();
     }
 
     /*
@@ -110,16 +93,15 @@ public class AquariumReceiverService extends Service implements MqttCallback {
         }
 
         Log.i(TAG, "onStartCommand: initializeSettings: " + initializeSettings + " initialized: " +
-                initialized + "dataType + " + dataType);
+                m_initialized + "dataType + " + dataType);
 
-        if (initializeSettings && !this.initialized)
+        if (initializeSettings && !this.m_initialized)
         {
-            this.initializedDate = new Date().toString();
-            this.initialized = true;
+            String initializedDate = new Date().toString();
+            this.m_initialized = true;
             Log.i(TAG, "Initializing PushReceiver Service for first time: " + initializedDate);
-            //This version uses SSL.
-            brokerUrl = "ssl://" + intent.getStringExtra("server") + ":" + intent.getStringExtra("port");
-            dataStore = new MemoryPersistence();
+            m_server = "tcp://mqttserver:1883";
+            m_dataStore = new MemoryPersistence();
 
             serviceHeartBeatThread = new Thread()
             {
@@ -127,7 +109,7 @@ public class AquariumReceiverService extends Service implements MqttCallback {
                 {
                     try
                     {
-                        while (contServerHB)
+                        while (m_continueHeartBeat)
                         {
                             Thread.sleep(10000);
                             sendHeartBeat();
@@ -140,7 +122,7 @@ public class AquariumReceiverService extends Service implements MqttCallback {
 
                 }
             };
-            serviceHeartBeatThread.setName("PushServiceHeartBeat");
+            serviceHeartBeatThread.setName("AquariumHeartBeat");
             serviceHeartBeatThread.start();
 
             Thread t2 = new Thread()
@@ -157,7 +139,7 @@ public class AquariumReceiverService extends Service implements MqttCallback {
             };
             t2.start();
         }
-        else if (initializeSettings && this.initialized)
+        else if (initializeSettings && this.m_initialized)
         {
             Log.d(TAG,"Push service started while already initialized, ignoring");
         }
@@ -179,7 +161,7 @@ public class AquariumReceiverService extends Service implements MqttCallback {
      */
     private void publish(String topicName, int qos, byte[] payload) throws MqttException {
         // Get an instance of the topic
-        MqttTopic topic = client.getTopic(topicName);
+        MqttTopic topic = m_client.getTopic(topicName);
 
         MqttMessage message = new MqttMessage(payload);
         message.setQos(qos);
@@ -195,43 +177,43 @@ public class AquariumReceiverService extends Service implements MqttCallback {
 
     private synchronized void makeConnection() {
 
-        Log.i(TAG, "Making connection to push notification server: " + brokerUrl);
+        Log.i(TAG, "Making connection to push notification server: " + m_server);
 
         try {
-            if (client == null) {
+            if (m_client == null) {
                 // Construct the MqttClient instance
-                client = new MqttClient(brokerUrl, clientId, dataStore);
+                m_client = new MqttClient(m_server, m_clientId, m_dataStore);
 
                 // Set this wrapper as the callback handler
-                client.setCallback(AquariumReceiverService.this);
+                m_client.setCallback(AquariumReceiverService.this);
 
                 // Construct the object that contains connection parameters
                 // such as cleansession and LWAT
-                conOpt = new MqttConnectOptions();
-                conOpt.setCleanSession(false);
-                conOpt.setConnectionTimeout(CONNECTION_TIMEOUT);
-                conOpt.setKeepAliveInterval(KEEP_ALIVE_INTERVAL);
+                m_options = new MqttConnectOptions();
+                m_options.setCleanSession(false);
+                m_options.setConnectionTimeout(CONNECTION_TIMEOUT);
+                m_options.setKeepAliveInterval(KEEP_ALIVE_INTERVAL);
             }
 
-                if (!client.isConnected()) {
+                if (!m_client.isConnected()) {
                     // Connect to the server
-                    Log.i(TAG, "Connecting to " + brokerUrl);
-                    client.connect(conOpt);
+                    Log.i(TAG, "Connecting to " + m_server);
+                    m_client.connect(m_options);
 
                     // Subscribe to the topic
-                    String[] topicsArray = new String[topics.size()];
-                    topicsArray = topics.toArray(topicsArray);
+                    String[] topicsArray = new String[m_topics.size()];
+                    topicsArray = m_topics.toArray(topicsArray);
 
-                    qos = new int[topics.size()];
-                    for (int i = 0; i < topics.size(); i++)
-                        qos[i] = QOS;
+                    m_qos = new int[m_topics.size()];
+                    for (int i = 0; i < m_topics.size(); i++)
+                        m_qos[i] = QOS;
 
-                    Log.i(TAG, "Push isConnected : " + client.isConnected());
+                    Log.i(TAG, "Push isConnected : " + m_client.isConnected());
 
-                    if (client.isConnected()) {
-                        client.subscribe(topicsArray, qos);
+                    if (m_client.isConnected()) {
+                        m_client.subscribe(topicsArray, m_qos);
                         sendHeartBeat();
-                        Log.i(TAG, "Subscribed to topic \"" + topics + "\" qos " + Arrays.toString(qos));
+                        Log.i(TAG, "Subscribed to topic \"" + m_topics + "\" qos " + Arrays.toString(m_qos));
                     }
             } else {
                 Log.i(TAG, "No internet connection detected, waiting on connecting to push server until connection detected");
@@ -254,11 +236,11 @@ public class AquariumReceiverService extends Service implements MqttCallback {
      */
     @Override
     public void onDestroy() {
-        if (client != null && client.isConnected()) {
+        if (m_client != null && m_client.isConnected()) {
             // Disconnect the client
             try {
                 // gracefully disconnect by announcing the presence off
-                client.disconnect();
+                m_client.disconnect();
             } catch (Exception e) {
                 e.printStackTrace();
                 Log.e(TAG, "Error in disconnect client: " + e.toString());
@@ -320,14 +302,14 @@ public class AquariumReceiverService extends Service implements MqttCallback {
     }
 
     public boolean isConnected() {
-        return client != null && client.isConnected();
+        return m_client != null && m_client.isConnected();
     }
 
     private void sendHeartBeat() {
         String payload = "{\"value\":\"beat\"}";
         try {
-            if (client != null) {
-                if (client.isConnected()) {
+            if (m_client != null) {
+                if (m_client.isConnected()) {
                     publish("aquarium/heartbeat", 0, payload.getBytes());
                 }
             }
