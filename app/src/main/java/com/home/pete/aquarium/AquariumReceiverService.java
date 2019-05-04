@@ -2,10 +2,7 @@ package com.home.pete.aquarium;
 
 import android.app.Notification;
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -23,13 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 public class AquariumReceiverService extends Service implements MqttCallback {
     private static final int KEEP_ALIVE_INTERVAL = 15;
@@ -59,11 +49,6 @@ public class AquariumReceiverService extends Service implements MqttCallback {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see android.app.Service#onCreate()
-     */
     @Override
     public void onCreate() {
         super.onCreate();
@@ -73,13 +58,10 @@ public class AquariumReceiverService extends Service implements MqttCallback {
         startForeground(5131, m_notification);
 
         m_topics = new ArrayList<String>();
+        m_topics.add("aquarium/temperature");
+        m_topics.add("aquarium/waterlevel");
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see android.app.Service#onStartCommand(android.content.Intent, int, int)
-     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         boolean initializeSettings = intent.getBooleanExtra("initializing", false);
@@ -229,11 +211,6 @@ public class AquariumReceiverService extends Service implements MqttCallback {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see android.app.Service#onDestroy()
-     */
     @Override
     public void onDestroy() {
         if (m_client != null && m_client.isConnected()) {
@@ -254,26 +231,11 @@ public class AquariumReceiverService extends Service implements MqttCallback {
         System.exit(0);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.paho.client.mqttv3.MqttCallback#connectionLost(java.lang.
-     * Throwable)
-     */
     @Override
     public void connectionLost(Throwable cause) {
         Log.i(TAG, "connectionLost : " + cause);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.paho.client.mqttv3.MqttCallback#messageArrived(org.eclipse
-     * .paho.client.mqttv3.MqttTopic,
-     * org.eclipse.paho.client.mqttv3.MqttMessage)
-     */
     @Override
     public void messageArrived(String s, MqttMessage mqttMessage) {
         if (s.equals("aquarium/temperature")) {
@@ -288,13 +250,6 @@ public class AquariumReceiverService extends Service implements MqttCallback {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.paho.client.mqttv3.MqttCallback#deliveryComplete(org.eclipse
-     * .paho.client.mqttv3.MqttDeliveryToken)
-     */
     @Override
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken)
     {
