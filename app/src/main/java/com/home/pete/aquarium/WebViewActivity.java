@@ -3,10 +3,7 @@ package com.home.pete.aquarium;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 
 /**
  * Skeleton of an Android Things activity.
@@ -27,33 +24,11 @@ import android.view.View;
  *
  * @see <a href="https://github.com/androidthings/contrib-drivers#readme">https://github.com/androidthings/contrib-drivers#readme</a>
  */
-public class MainActivity extends Activity {
-    private static final String TAG = MainActivity.class.getSimpleName();
-
-    private Intent m_webviewIntent;
-    private Intent m_dataviewIntent;
+public class WebViewActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        Log.d(TAG, "onCreate");
-        m_webviewIntent = new Intent(this, WebViewActivity.class);
-        m_dataviewIntent = new Intent(this, DataViewActivity.class);
-        startService(new Intent(this, AquariumReceiverService.class));
+        setContentView(R.layout.activity_web_view);
     }
-
-    public void viewData(View view)
-    {
-        Log.d(TAG, "Viewing settings");
-        startActivity(m_dataviewIntent);
-    }
-
-    public void viewFish(View view)
-    {
-        Log.d(TAG, "Viewing settings");
-        startActivity(m_webviewIntent);
-    }
-
 }

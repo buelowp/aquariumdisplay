@@ -1,25 +1,31 @@
 package com.home.pete.aquarium;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.IBinder;
 import android.util.Log;
+import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.MqttTopic;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
+import static com.home.pete.aquarium.Constants.MQTT_BROKER_URL;
 
 public class AquariumReceiverService extends Service implements MqttCallback {
     private static final int KEEP_ALIVE_INTERVAL = 15;
@@ -54,35 +60,43 @@ public class AquariumReceiverService extends Service implements MqttCallback {
         super.onCreate();
         Log.i(TAG, "onCreate");
 
-        // always foreground
-        startForeground(5131, m_notification);
+        startMyOwnForeground();
 
         m_topics = new ArrayList<String>();
         m_topics.add("aquarium/temperature");
         m_topics.add("aquarium/waterlevel");
     }
 
+    private void startMyOwnForeground(){
+        String NOTIFICATION_CHANNEL_ID = "com.home.pete.aquarium";
+        String channelName = "Paho MQTT Receiver";
+        NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
+        chan.setLightColor(Color.BLUE);
+        chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        assert manager != null;
+        manager.createNotificationChannel(chan);
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
+        Notification notification = notificationBuilder.setOngoing(true)
+                .setSmallIcon(R.drawable.fish)
+                .setContentTitle("App is running in background")
+                .setPriority(NotificationManager.IMPORTANCE_MIN)
+                .setCategory(Notification.CATEGORY_SERVICE)
+                .build();
+        startForeground(2, notification);
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        boolean initializeSettings = intent.getBooleanExtra("initializing", false);
-        String dataType = intent.getStringExtra("dataType");
+        Log.i(TAG, "onStartCommand");
 
-        //Fill this in if null.  We use it for debugging below
-        //and it can be null in certain cases
-        if (dataType == null)
-        {
-            dataType = "invalidDataType";
-        }
-
-        Log.i(TAG, "onStartCommand: initializeSettings: " + initializeSettings + " initialized: " +
-                m_initialized + "dataType + " + dataType);
-
-        if (initializeSettings && !this.m_initialized)
+        if (!this.m_initialized)
         {
             String initializedDate = new Date().toString();
             this.m_initialized = true;
             Log.i(TAG, "Initializing PushReceiver Service for first time: " + initializedDate);
-            m_server = "tcp://mqttserver:1883";
+            m_server = MQTT_BROKER_URL;
             m_dataStore = new MemoryPersistence();
 
             serviceHeartBeatThread = new Thread()
@@ -121,7 +135,7 @@ public class AquariumReceiverService extends Service implements MqttCallback {
             };
             t2.start();
         }
-        else if (initializeSettings && this.m_initialized)
+        else if (this.m_initialized)
         {
             Log.d(TAG,"Push service started while already initialized, ignoring");
         }
@@ -136,25 +150,17 @@ public class AquariumReceiverService extends Service implements MqttCallback {
     /**
      * Performs a single publish
      *
-     * @param topicName the topic to publish to
+     * @param topic the topic to publish to
      * @param qos       the qos to publish at
      * @param payload   the payload of the message to publish
      * @throws MqttException What happens when we fail
      */
-    private void publish(String topicName, int qos, byte[] payload) throws MqttException {
-        // Get an instance of the topic
-        MqttTopic topic = m_client.getTopic(topicName);
-
+    private void publish(String topic, int qos, byte[] payload) throws MqttException {
         MqttMessage message = new MqttMessage(payload);
         message.setQos(qos);
 
         // Publish the message
-        MqttDeliveryToken token = topic.publish(message);
-
-        // Wait until the message has been delivered to the server
-        token.waitForCompletion();
-        //Log.i(TAG, "Published presence: " + topicName);
-
+        m_client.publish(topic, message);
     }
 
     private synchronized void makeConnection() {
@@ -177,26 +183,26 @@ public class AquariumReceiverService extends Service implements MqttCallback {
                 m_options.setKeepAliveInterval(KEEP_ALIVE_INTERVAL);
             }
 
-                if (!m_client.isConnected()) {
-                    // Connect to the server
-                    Log.i(TAG, "Connecting to " + m_server);
-                    m_client.connect(m_options);
+            if (!m_client.isConnected()) {
+                // Connect to the server
+                Log.i(TAG, "Connecting to " + m_server);
+                m_client.connect(m_options);
 
-                    // Subscribe to the topic
-                    String[] topicsArray = new String[m_topics.size()];
-                    topicsArray = m_topics.toArray(topicsArray);
+                // Subscribe to the topic
+                String[] topicsArray = new String[m_topics.size()];
+                topicsArray = m_topics.toArray(topicsArray);
 
-                    m_qos = new int[m_topics.size()];
-                    for (int i = 0; i < m_topics.size(); i++)
-                        m_qos[i] = QOS;
+                m_qos = new int[m_topics.size()];
+                for (int i = 0; i < m_topics.size(); i++)
+                    m_qos[i] = QOS;
 
-                    Log.i(TAG, "Push isConnected : " + m_client.isConnected());
+                Log.i(TAG, "Push isConnected : " + m_client.isConnected());
 
-                    if (m_client.isConnected()) {
-                        m_client.subscribe(topicsArray, m_qos);
-                        sendHeartBeat();
-                        Log.i(TAG, "Subscribed to topic \"" + m_topics + "\" qos " + Arrays.toString(m_qos));
-                    }
+                if (m_client.isConnected()) {
+                    m_client.subscribe(topicsArray, m_qos);
+                    sendHeartBeat();
+                    Log.i(TAG, "Subscribed to topic \"" + m_topics + "\" qos " + Arrays.toString(m_qos));
+                }
             } else {
                 Log.i(TAG, "No internet connection detected, waiting on connecting to push server until connection detected");
             }
@@ -240,13 +246,15 @@ public class AquariumReceiverService extends Service implements MqttCallback {
     public void messageArrived(String s, MqttMessage mqttMessage) {
         if (s.equals("aquarium/temperature")) {
             Double value = Double.valueOf(new String(mqttMessage.getPayload()));
-            String result = value.toString();
-            Log.d(TAG, result);
+            Intent msg = new Intent("temperature");
+            msg.putExtra("ACTION", value);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(msg);
         }
         if (s.equals("aquarium/waterlevel")) {
-            Double value = Double.valueOf(new String(mqttMessage.getPayload()));
-            String result = value.toString();
-            Log.d(TAG, result);
+            Integer value = Integer.valueOf(new String(mqttMessage.getPayload()));
+            Intent msg = new Intent("waterlevel");
+            msg.putExtra("ACTION", value);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(msg);
         }
     }
 

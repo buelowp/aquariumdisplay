@@ -1,9 +1,10 @@
 <resources>
     <string name="app_name">Aquarium</string>
-    <string name="temperature">Temperature</string>
-    <string name="Waterlevel">Water Level</string>
-    <string name="viewfish">See the Fish</string>
-    <string name="viewdata">Aquarium Data</string>
-    <string name="waterchange">Last Water Change</string>
-    <string name="exitdataview">Exit</string>
+    <string name="ExitButton">Exit</string>
+    <string name="FishButton">Fish Button</string>
+    <string name="DataButton">Data Button</string>
+    <string name="FishButtonLabel">See the Fish</string>
+    <string name="DataButtonLabel">Aquarium Data</string>
+    <string name="AquariumTempLabel">Temperature:</string>
+    <string name="AquariumWaterLevelLabel">Water Level:</string>
 </resources>

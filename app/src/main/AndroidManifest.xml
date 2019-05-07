@@ -2,28 +2,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.home.pete.aquarium">
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-    <application android:label="@string/app_name"
-        android:allowBackup="false"
-        android:icon="@drawable/fish">
-        <service android:name="com.home.pete.aquarium.AquariumReceiverService"
-            android:exported="false" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </service>
-
+    <application android:label="@string/app_name">
         <uses-library android:name="com.google.android.things" />
 
-        <activity android:name=".WebviewActivity" android:theme="@android:style/Theme.NoTitleBar">
+        <activity android:name=".WebViewActivity" android:theme="@android:style/Theme.NoTitleBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DataviewActivity" android:theme="@android:style/Theme.NoTitleBar">
+        <activity android:name=".DataViewActivity" android:theme="@android:style/Theme.NoTitleBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -44,6 +35,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <meta-data android:name="android.webkit.WebView.EnableSafeBrowsing" android:value="false" />
+        <service android:name="com.home.pete.aquarium.AquariumReceiverService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
     </application>
+
 </manifest>

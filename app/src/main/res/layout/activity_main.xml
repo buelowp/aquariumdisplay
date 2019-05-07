@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,62 +7,55 @@
     android:background="@android:color/background_dark"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/fishButtonText"
-        android:layout_width="200px"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="100dp"
-        android:layout_marginTop="8dp"
-        android:background="@android:color/background_dark"
-        android:gravity="center"
-        android:text="@string/viewfish"
-        android:textColor="@android:color/white"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fishViewButton" />
-
     <ImageButton
-        android:id="@+id/fishViewButton"
-        android:layout_width="200px"
-        android:layout_height="200px"
-        android:layout_marginStart="100dp"
+        android:id="@+id/imageButtonFish"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginStart="64dp"
         android:layout_marginTop="32dp"
-        android:adjustViewBounds="true"
         android:background="@android:color/background_dark"
+        android:contentDescription="@string/FishButton"
         android:onClick="viewFish"
-        android:scaleType="fitCenter"
+        android:scaleType="centerInside"
         android:src="@drawable/fish"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
-        android:id="@+id/dataViewButton"
-        android:layout_width="200px"
-        android:layout_height="200px"
+        android:id="@+id/imageButtonData"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="100dp"
-        android:adjustViewBounds="true"
+        android:layout_marginEnd="64dp"
         android:background="@android:color/background_dark"
+        android:contentDescription="@string/DataButton"
         android:onClick="viewData"
-        android:scaleType="fitCenter"
+        android:scaleType="centerInside"
         android:src="@drawable/bulbicon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/dataButtonText"
-        android:layout_width="200px"
+        android:id="@+id/textViewFishLabel"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="100dp"
-        android:background="@android:color/background_dark"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="16dp"
         android:gravity="center"
-        android:text="@string/viewdata"
-        android:textColor="@android:color/white"
+        android:text="@string/FishButtonLabel"
         android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dataViewButton" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageButtonFish" />
 
-</android.support.constraint.ConstraintLayout>
+    <TextView
+        android:id="@+id/textViewDataLabel"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="64dp"
+        android:gravity="center"
+        android:text="@string/DataButtonLabel"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageButtonData" />
+</androidx.constraintlayout.widget.ConstraintLayout>
