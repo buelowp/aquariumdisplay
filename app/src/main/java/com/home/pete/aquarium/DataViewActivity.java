@@ -9,9 +9,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
+import static com.home.pete.aquarium.Constants.VIEW_TIMEOUT;
 
 /**
  * Skeleton of an Android Things activity.
@@ -37,6 +43,7 @@ public class DataViewActivity extends Activity {
 
     TextView m_textViewTemperature;
     TextView m_textViewWaterLevel;
+    Handler m_exitHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +55,8 @@ public class DataViewActivity extends Activity {
 
         LocalBroadcastManager.getInstance(this).registerReceiver(temperatureUpdate, new IntentFilter("temperature"));
         LocalBroadcastManager.getInstance(this).registerReceiver(waterlevelUpdate, new IntentFilter("waterlevel"));
+
+        m_exitHandler.postDelayed(exitViewOnTimeout, VIEW_TIMEOUT);
     }
 
     @Override
@@ -59,6 +68,7 @@ public class DataViewActivity extends Activity {
     public void exitView(View view)
     {
         Log.d(TAG, "Closing view");
+        m_exitHandler.removeCallbacks(exitViewOnTimeout);
         finish();
     }
 
@@ -85,4 +95,11 @@ public class DataViewActivity extends Activity {
         super.onResume();
     }
 
+    private Runnable exitViewOnTimeout = new Runnable() {
+        @Override
+        public void run() {
+            Log.d(TAG, "Closing view due to timeout handler");
+            finish();
+        }
+    };
 }
