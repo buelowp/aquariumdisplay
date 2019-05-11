@@ -1,12 +1,15 @@
 package com.home.pete.aquarium;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.webkit.WebView;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.home.pete.aquarium.Constants.VIEW_TIMEOUT;
@@ -30,141 +33,27 @@ import static com.home.pete.aquarium.Constants.VIEW_TIMEOUT;
  *
  * @see <a href="https://github.com/androidthings/contrib-drivers#readme">https://github.com/androidthings/contrib-drivers#readme</a>
  */
-public class WebViewActivity extends Activity implements
-        GestureDetector.OnGestureListener,
-        GestureDetector.OnDoubleTapListener
+public class WebViewActivity extends Activity
 {
     private static final String TAG = WebViewActivity.class.getSimpleName();
 
-    private WebView m_webview;
+    private MyWebView m_webview;
     private GestureDetector m_detector;
-    private List<String> m_urlList;
-    private int m_index;
     Handler m_exitHandler = new Handler();
     boolean m_gestureAvailable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_web_view);
+        m_webview = new MyWebView(this);
+        setContentView(m_webview);
 
-        m_gestureAvailable = false;
-
-        m_webview = findViewById(R.id.webViewFishView);
-        try {
-            m_detector = new GestureDetector(m_webview.getContext(), this);
-            m_detector.setOnDoubleTapListener(this);
-            m_gestureAvailable = true;
-        }
-        catch (NullPointerException e) {
-            Log.e(TAG, "Unable to instantiate Gesture Detection");
-        }
-
-        m_urlList.add("https://en.wikipedia.org/wiki/Neon_tetra");
-        m_urlList.add("https://en.wikipedia.org/wiki/Hemigrammus_erythrozonus");
-        m_urlList.add("https://en.wikipedia.org/wiki/Hypostomus_plecostomus");
-        m_urlList.add("https://en.wikipedia.org/wiki/Pterophyllum");
-        m_urlList.add("https://en.wikipedia.org/wiki/Ram_cichlid");
-        m_urlList.add("https://en.wikipedia.org/wiki/Siamese_algae_eater");
-        m_urlList.add("https://en.wikipedia.org/wiki/GloFish");
-        m_urlList.add("https://en.wikipedia.org/wiki/Serpae_tetra");
-        Log.d(TAG, "Created all applicable URL's");
-
-        m_index = 0;
         m_exitHandler.postDelayed(exitViewOnTimeout, VIEW_TIMEOUT);
     }
 
     @Override
     protected void onStart() {
-        if (m_index >= 0 && m_index < m_urlList.size())
-            m_webview.loadUrl(m_urlList.get(m_index));
-        else {
-            m_index = 0;
-            m_webview.loadUrl(m_urlList.get(m_index));
-        }
-
         super.onStart();
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event)
-    {
-        if (m_gestureAvailable) {
-            if (this.m_detector.onTouchEvent(event)) {
-                return true;
-            }
-        }
-        return super.onTouchEvent(event);
-    }
-
-    @Override
-    public boolean onDown(MotionEvent event)
-    {
-        Log.d(TAG,"onDown: " + event.toString());
-        return true;
-    }
-
-    @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float vX, float vY)
-    {
-        Log.d(TAG, "onFling: " + e1.toString() + e2.toString());
-        m_exitHandler.removeCallbacks(exitViewOnTimeout);
-        m_exitHandler.postDelayed(exitViewOnTimeout, VIEW_TIMEOUT);
-        return true;
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float dX, float dY)
-    {
-        Log.d(TAG, "onScroll: " + e1.toString() + e2.toString());
-        m_exitHandler.removeCallbacks(exitViewOnTimeout);
-        m_exitHandler.postDelayed(exitViewOnTimeout, VIEW_TIMEOUT);
-        return true;
-    }
-
-    @Override
-    public void onShowPress(MotionEvent event)
-    {
-        Log.d(TAG, "onShowPress: " + event.toString());
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent event)
-    {
-        Log.d(TAG, "onSingleTapUp: " + event.toString());
-        return true;
-    }
-
-    @Override
-    public boolean onDoubleTap(MotionEvent event)
-    {
-        Log.d(TAG, "onDoubleTap: " + event.toString());
-        m_index = 0;
-        finish();
-        return true;
-    }
-
-    @Override
-    public boolean onDoubleTapEvent(MotionEvent event)
-    {
-        Log.d(TAG, "onDoubleTapEvent: " + event.toString());
-        m_index = 0;
-        m_exitHandler.removeCallbacks(exitViewOnTimeout);
-        finish();
-        return true;
-    }
-
-    @Override
-    public boolean onSingleTapConfirmed(MotionEvent event)
-    {
-        Log.d(TAG, "onSingleTapConfirmed: " + event.toString());
-        return true;
-    }
-
-    @Override
-    public void onLongPress(MotionEvent event)
-    {
-        Log.d(TAG, "onLongPress: " + event.toString());
     }
 
     private Runnable exitViewOnTimeout = new Runnable() {
@@ -174,4 +63,77 @@ public class WebViewActivity extends Activity implements
             finish();
         }
     };
+
+    public class MyWebView extends WebView {
+        private boolean flinged;
+
+        private static final int SWIPE_MIN_DISTANCE = 320;
+        private static final int SWIPE_MAX_OFF_PATH = 250;
+        private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+        private ArrayList<String> m_urlList;
+        private String m_url = "http://172.24.1.12/fish/fishview.php?fishname=";
+        GestureDetector gd;
+        private int m_index;
+
+        public MyWebView(Context context) {
+            super(context);
+            gd = new GestureDetector(context, sogl);
+            m_urlList = new ArrayList<String>();
+
+            m_urlList.add("Gold_Veil_Angelfish");
+            m_urlList.add("Butterfly_Plecostomus");
+            m_urlList.add("Electric_Blue_Ram");
+            m_urlList.add("Flying_Fox");
+            m_urlList.add("White_Widow_Tetra");
+            m_urlList.add("Glowlight_Tetra");
+            m_urlList.add("Gold_Neon_Tetra");
+            m_urlList.add("Neon_Tetra");
+            m_urlList.add("Rummynose_Tetra");
+            m_urlList.add("Serpae_Tetra");
+            m_urlList.add("Glow_Tiger_Barb");
+            m_urlList.add("Green_Neon_Tetra");
+            Log.d(TAG, "Created all applicable URL's");
+
+            m_index = 0;
+            String url = m_url  + m_urlList.get(m_index);
+            loadUrl(url);
+        }
+
+        @Override
+        public boolean onTouchEvent(MotionEvent event) {
+            gd.onTouchEvent(event);
+            if (flinged) {
+                flinged = false;
+                return true;
+            } else {
+                return super.onTouchEvent(event);
+            }
+        }
+
+        GestureDetector.SimpleOnGestureListener sogl = new GestureDetector.SimpleOnGestureListener() {
+            public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
+                if (Math.abs(event1.getY() - event1.getY()) > SWIPE_MAX_OFF_PATH) {
+                    Log.d(TAG, "swipe max off path");
+                    return false;
+                }
+                if(event1.getX() - event2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    if (m_index == m_urlList.size() - 1)
+                        m_index = -1;
+                    String url = m_url  + m_urlList.get(++m_index);
+                    loadUrl(url);
+                    Log.i("Swiped","swipe left");
+                    flinged = true;
+                } else if (event2.getX() - event1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    if (m_index == 0) {
+                        m_index = m_urlList.size();
+                    }
+                    String url = m_url  + m_urlList.get(--m_index);
+                    loadUrl(url);
+                    Log.i("Swiped","swipe right");
+                    flinged = true;
+                }
+                return true;
+            }
+        };
+    }
 }

@@ -268,7 +268,8 @@ public class AquariumReceiverService extends Service implements MqttCallback {
         return m_client != null && m_client.isConnected();
     }
 
-    private void sendHeartBeat() {
+    private void sendHeartBeat()
+    {
         String payload = "{\"value\":\"beat\"}";
         try {
             if (m_client != null) {
