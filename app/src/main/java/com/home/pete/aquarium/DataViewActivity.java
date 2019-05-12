@@ -61,7 +61,7 @@ public class DataViewActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        Log.e(TAG, "onDestroy");
+        Log.d(TAG, "onDestroy");
         super.onDestroy();
     }
 
@@ -86,7 +86,17 @@ public class DataViewActivity extends Activity {
         public void onReceive(Context context, Intent intent)
         {
             Integer value = intent.getIntExtra("ACTION", 0);
-            m_textViewWaterLevel.setText(value.toString());
+            String text;
+            if (value > 2760)
+                text = "full";
+            else if (value > 2750)
+                text = "-1 cm";
+            else if (value > 2730)
+                text = "-2 cm";
+            else
+                text = value.toString();
+
+            m_textViewWaterLevel.setText(text);
         }
     };
 

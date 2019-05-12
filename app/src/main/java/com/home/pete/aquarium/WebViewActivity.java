@@ -40,7 +40,6 @@ public class WebViewActivity extends Activity
     private MyWebView m_webview;
     private GestureDetector m_detector;
     Handler m_exitHandler = new Handler();
-    boolean m_gestureAvailable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +101,8 @@ public class WebViewActivity extends Activity
         @Override
         public boolean onTouchEvent(MotionEvent event) {
             gd.onTouchEvent(event);
+            m_exitHandler.removeCallbacks(exitViewOnTimeout);
+            m_exitHandler.postDelayed(exitViewOnTimeout, VIEW_TIMEOUT);
             if (flinged) {
                 flinged = false;
                 return true;
