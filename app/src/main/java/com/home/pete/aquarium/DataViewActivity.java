@@ -43,6 +43,9 @@ public class DataViewActivity extends Activity {
 
     TextView m_textViewTemperature;
     TextView m_textViewWaterLevel;
+    TextView m_textViewIronAddition;
+    TextView m_textViewWaterChange;
+    TextView m_textViewFilterChange;
     Handler m_exitHandler = new Handler();
 
     @Override
@@ -52,9 +55,16 @@ public class DataViewActivity extends Activity {
 
         m_textViewTemperature = findViewById(R.id.textViewTemperatureData);
         m_textViewWaterLevel = findViewById(R.id.textViewWaterLevelData);
+        m_textViewFilterChange = findViewById(R.id.textViewFilterChangeDateData);
+        m_textViewIronAddition = findViewById(R.id.textViewIronAdditionDateData);
+        m_textViewWaterChange = findViewById(R.id.textViewWaterChangeDateData);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(temperatureUpdate, new IntentFilter("temperature"));
         LocalBroadcastManager.getInstance(this).registerReceiver(waterlevelUpdate, new IntentFilter("waterlevel"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(filterChangeUpdate, new IntentFilter("filterchange"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(waterChangeUpdate, new IntentFilter("waterchange"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(ironAdditionUpdate, new IntentFilter("ironaddition"));
+
 
         m_exitHandler.postDelayed(exitViewOnTimeout, VIEW_TIMEOUT);
     }
@@ -78,6 +88,33 @@ public class DataViewActivity extends Activity {
         {
             Double value = intent.getDoubleExtra("ACTION", 0.0);
             m_textViewTemperature.setText(value.toString() + " \u2109");
+        }
+    };
+
+    private BroadcastReceiver filterChangeUpdate = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            Double value = intent.getDoubleExtra("ACTION", 0.0);
+            m_textViewFilterChange.setText(value.toString());
+        }
+    };
+
+    private BroadcastReceiver waterChangeUpdate = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            Double value = intent.getDoubleExtra("ACTION", 0.0);
+            m_textViewWaterChange.setText(value.toString());
+        }
+    };
+
+    private BroadcastReceiver ironAdditionUpdate = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            String value = intent.getStringExtra("ACTION");
+            m_textViewIronAddition.setText(value);
         }
     };
 

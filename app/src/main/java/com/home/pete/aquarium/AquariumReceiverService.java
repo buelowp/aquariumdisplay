@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 import androidx.core.app.NotificationCompat;
@@ -46,13 +47,21 @@ public class AquariumReceiverService extends Service implements MqttCallback {
 
     public boolean m_initialized = false;
 
+    private final IBinder m_binder = new MyLocalBinder();
+
     Thread serviceHeartBeatThread;
     private boolean m_continueHeartBeat = true;
+
+    public class MyLocalBinder extends Binder {
+        AquariumReceiverService getService() {
+            return AquariumReceiverService.this;
+        }
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
         Log.i(TAG, "onBind");
-        return null;
+        return m_binder;
     }
 
     @Override
@@ -65,6 +74,9 @@ public class AquariumReceiverService extends Service implements MqttCallback {
         m_topics = new ArrayList<String>();
         m_topics.add("aquarium/temperature");
         m_topics.add("aquarium/waterlevel");
+        m_topics.add("aquarium/filterchange");
+        m_topics.add("aquarium/waterchange");
+        m_topics.add("aquarium/ironaddition");
     }
 
     private void startMyOwnForeground(){

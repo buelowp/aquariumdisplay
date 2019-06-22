@@ -9,7 +9,7 @@
 
     <TextView
         android:id="@+id/textViewTemperatureLabel"
-        android:layout_width="120dp"
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
@@ -22,10 +22,10 @@
 
     <TextView
         android:id="@+id/textViewWaterLevelLabel"
-        android:layout_width="120dp"
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:gravity="right"
         android:text="@string/AquariumWaterLevelLabel"
         android:textColor="@android:color/white"
@@ -52,7 +52,7 @@
         android:layout_width="75dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:gravity="left"
         android:textColor="@android:color/white"
         android:textSize="18sp"
@@ -71,4 +71,79 @@
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/textViewWaterChangeDateData"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:textSize="18sp"
+        android:layout_width="75dp"
+        android:textColor="@android:color/white"
+        app:layout_constraintStart_toEndOf="@+id/textViewWaterChangeDate"
+        app:layout_constraintTop_toBottomOf="@+id/textViewWaterLevelData" />
+
+    <TextView
+        android:id="@+id/textViewWaterChangeDate"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/WaterChangeDateLabel"
+        android:textSize="18sp"
+        android:gravity="right"
+        android:textColor="@android:color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewWaterLevelLabel" />
+
+    <TextView
+        android:id="@+id/textViewIronAdditionDate"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:gravity="right"
+        android:text="@string/IronAdditonLabel"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewWaterChangeDate" />
+
+    <TextView
+        android:id="@+id/textViewIronAdditionDateData"
+        android:layout_width="75dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:textSize="18sp"
+        android:gravity="left"
+        android:textColor="@android:color/white"
+        app:layout_constraintStart_toEndOf="@+id/textViewIronAdditionDate"
+        app:layout_constraintTop_toBottomOf="@+id/textViewWaterChangeDateData" />
+
+    <TextView
+        android:id="@+id/textViewFilterChangeDate"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:gravity="right"
+        android:text="@string/FilterChangeDateLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewIronAdditionDate" />
+
+    <TextView
+        android:id="@+id/textViewFilterChangeDateData"
+        android:layout_width="75dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:gravity="left"
+        app:layout_constraintStart_toEndOf="@+id/textViewFilterChangeDate"
+        app:layout_constraintTop_toBottomOf="@+id/textViewIronAdditionDateData" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

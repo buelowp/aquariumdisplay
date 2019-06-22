@@ -4,9 +4,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -37,6 +41,7 @@ import static com.home.pete.aquarium.Constants.VIEW_TIMEOUT;
 public class MainActivity extends Activity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private AquariumReceiverService m_ars;
     private Intent m_webviewIntent;
     private Intent m_dataviewIntent;
     private boolean m_displayActive;
@@ -46,6 +51,8 @@ public class MainActivity extends Activity {
     ImageButton m_dataView;
     TextView m_fishTextView;
     TextView m_dataTextView;
+    boolean isBound = false;
+    boolean m_shouldUnbind = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +72,31 @@ public class MainActivity extends Activity {
         startService(new Intent(this, AquariumReceiverService.class));
         m_hideViewHandler = new Handler();
         m_hideViewHandler.postDelayed(hideViewOnTimeout, VIEW_TIMEOUT);
+    }
+
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            m_ars = ((AquariumReceiverService.MyLocalBinder)service).getService();
+            isBound = true;
+        }
+
+        public void onServiceDisconnected(ComponentName arg0) {
+            m_ars = null;
+            isBound = false;
+        }
+    };
+
+    void doBindService() {
+        if (bindService(new Intent(MainActivity.this, AquariumReceiverService.class), serviceConnection, Context.BIND_AUTO_CREATE)) {
+            m_shouldUnbind = true;
+        }
+    }
+
+    void doUnbindService() {
+        if (m_shouldUnbind) {
+            unbindService(serviceConnection);
+            m_shouldUnbind = false;
+        }
     }
 
     @Override
