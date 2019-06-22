@@ -2,9 +2,13 @@ package com.home.pete.aquarium;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -12,6 +16,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import org.json.JSONObject;
 
 import static com.home.pete.aquarium.Constants.VIEW_TIMEOUT;
 
@@ -65,6 +71,8 @@ public class MainActivity extends Activity {
         startService(new Intent(this, AquariumReceiverService.class));
         m_hideViewHandler = new Handler();
         m_hideViewHandler.postDelayed(hideViewOnTimeout, VIEW_TIMEOUT);
+        LocalBroadcastManager.getInstance(this).registerReceiver(databaseReply, new IntentFilter("databasereply"));
+
     }
 
     @Override
@@ -134,7 +142,13 @@ public class MainActivity extends Activity {
         m_dataView.setVisibility(state);
         m_fishTextView.setVisibility(state);
         m_dataTextView.setVisibility(state);
-
     }
+
+    private BroadcastReceiver databaseReply = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+        }
+    };
 
 }

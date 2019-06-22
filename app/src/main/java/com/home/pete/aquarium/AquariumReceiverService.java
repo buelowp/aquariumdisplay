@@ -4,8 +4,10 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.IBinder;
 import android.util.Log;
@@ -65,6 +67,9 @@ public class AquariumReceiverService extends Service implements MqttCallback {
         m_topics = new ArrayList<String>();
         m_topics.add("aquarium/temperature");
         m_topics.add("aquarium/waterlevel");
+        m_topics.add("database/reply");
+        LocalBroadcastManager.getInstance(this).registerReceiver(databaseRequest, new IntentFilter("temperature"));
+
     }
 
     private void startMyOwnForeground(){
@@ -281,4 +286,12 @@ public class AquariumReceiverService extends Service implements MqttCallback {
             Log.d(TAG, "Mqtt Exception : " + ex.getMessage());
         }
     }
+
+    private BroadcastReceiver databaseRequest = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+        }
+    };
+
 }
