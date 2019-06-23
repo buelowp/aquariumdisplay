@@ -7,4 +7,7 @@
     <string name="DataButtonLabel">Aquarium Data</string>
     <string name="AquariumTempLabel">Temperature:</string>
     <string name="AquariumWaterLevelLabel">Water Level:</string>
+    <string name="IronAdditonLabel">Last Iron Added:</string>
+    <string name="FilterChangeDateLabel">Last Filter Change:</string>
+    <string name="WaterChangeDateLabel">Last Water Change:</string>
 </resources>

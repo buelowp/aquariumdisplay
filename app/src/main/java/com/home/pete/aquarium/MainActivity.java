@@ -17,8 +17,6 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import org.json.JSONObject;
-
 import static com.home.pete.aquarium.Constants.VIEW_TIMEOUT;
 
 /**
