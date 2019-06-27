@@ -43,13 +43,16 @@ public class MainActivity extends Activity {
 
     private Intent m_webviewIntent;
     private Intent m_dataviewIntent;
+    private Intent m_switchviewIntent;
     private boolean m_displayActive;
     Handler m_hideViewHandler;
     ConstraintLayout m_layout;
     ImageButton m_fishView;
     ImageButton m_dataView;
+    ImageButton m_switchView;
     TextView m_fishTextView;
     TextView m_dataTextView;
+    TextView m_switchTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,19 +61,24 @@ public class MainActivity extends Activity {
         m_layout = findViewById(R.id.constraintLayout);
         m_fishView = findViewById(R.id.imageButtonFish);
         m_dataView = findViewById(R.id.imageButtonData);
+        m_switchView = findViewById(R.id.imageButtonSwitch);
         m_fishTextView = findViewById(R.id.textViewFishLabel);
         m_dataTextView = findViewById(R.id.textViewDataLabel);
+        m_switchTextView = findViewById(R.id.textViewSwitchLabel);
 
         m_displayActive = true;
 
         Log.d(TAG, "onCreate");
         m_webviewIntent = new Intent(this, WebViewActivity.class);
         m_dataviewIntent = new Intent(this, DataViewActivity.class);
+        m_switchviewIntent = new Intent(this, SwitchViewActivity.class);
+
         startService(new Intent(this, AquariumReceiverService.class));
+
         m_hideViewHandler = new Handler();
         m_hideViewHandler.postDelayed(hideViewOnTimeout, VIEW_TIMEOUT);
-        LocalBroadcastManager.getInstance(this).registerReceiver(databaseReply, new IntentFilter("databasereply"));
 
+        LocalBroadcastManager.getInstance(this).registerReceiver(databaseReply, new IntentFilter("databasereply"));
     }
 
     @Override
@@ -121,6 +129,14 @@ public class MainActivity extends Activity {
         Log.d(TAG, "Viewing settings");
         startActivity(m_webviewIntent);
         m_hideViewHandler.removeCallbacks(hideViewOnTimeout);
+    }
+
+    public void viewSwitches(View view)
+    {
+        Log.d(TAG, "Vewing switches");
+        startActivity(m_switchviewIntent);
+        m_hideViewHandler.removeCallbacks(hideViewOnTimeout);
+
     }
 
     private Runnable hideViewOnTimeout = new Runnable() {

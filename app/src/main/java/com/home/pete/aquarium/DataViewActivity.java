@@ -81,6 +81,8 @@ public class DataViewActivity extends Activity {
                     e.commit();
                     Log.i(TAG, "Stored " + time + " to shared preferences for last water change");
                     updateWaterChangeDate();
+                    m_exitHandler.removeCallbacks(exitViewOnTimeout);
+                    m_exitHandler.postDelayed(exitViewOnTimeout, VIEW_TIMEOUT);
                 }
 
                 return false;
@@ -98,6 +100,8 @@ public class DataViewActivity extends Activity {
                     e.commit();
                     Log.i(TAG, "Stored " + time + " to shared preferences for last iron addition");
                     updateIronAdditionDate();
+                    m_exitHandler.removeCallbacks(exitViewOnTimeout);
+                    m_exitHandler.postDelayed(exitViewOnTimeout, VIEW_TIMEOUT);
                 }
 
                 return false;
@@ -115,6 +119,8 @@ public class DataViewActivity extends Activity {
                     e.commit();
                     Log.i(TAG, "Stored " + time + " to shared preferences for last filter change");
                     updateFilterChangeDate();
+                    m_exitHandler.removeCallbacks(exitViewOnTimeout);
+                    m_exitHandler.postDelayed(exitViewOnTimeout, VIEW_TIMEOUT);
                 }
 
                 return false;

@@ -12,13 +12,16 @@
         android:id="@+id/imageButtonFish"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:layout_marginStart="64dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="32dp"
+        android:layout_marginEnd="8dp"
         android:background="@android:color/background_dark"
         android:contentDescription="@string/FishButton"
         android:onClick="viewFish"
         android:scaleType="centerInside"
         android:src="@drawable/fish"
+        app:layout_constraintEnd_toStartOf="@+id/imageButtonSwitch"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -26,25 +29,45 @@
         android:id="@+id/imageButtonData"
         android:layout_width="150dp"
         android:layout_height="150dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="64dp"
+        android:layout_marginEnd="8dp"
         android:background="@android:color/background_dark"
         android:contentDescription="@string/DataButton"
         android:onClick="viewData"
         android:scaleType="centerInside"
         android:src="@drawable/bulbicon"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/imageButtonSwitch"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/imageButtonSwitch"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="32dp"
+        android:background="@android:color/background_dark"
+        android:onClick="viewSwitches"
+        android:scaleType="centerInside"
+        android:src="@drawable/switch"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textViewFishLabel"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="64dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
         android:gravity="center"
+        android:onClick="viewFish"
         android:text="@string/FishButtonLabel"
         android:textSize="24sp"
+        app:layout_constraintEnd_toStartOf="@+id/textViewSwitchLabel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageButtonFish" />
 
@@ -52,11 +75,29 @@
         android:id="@+id/textViewDataLabel"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="64dp"
+        android:layout_marginEnd="8dp"
         android:gravity="center"
+        android:onClick="viewData"
         android:text="@string/DataButtonLabel"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textViewSwitchLabel"
         app:layout_constraintTop_toBottomOf="@+id/imageButtonData" />
+
+    <TextView
+        android:id="@+id/textViewSwitchLabel"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:onClick="viewSwitches"
+        android:text="@string/SwitchLabel"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageButtonSwitch" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

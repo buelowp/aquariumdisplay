@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 import androidx.core.app.NotificationCompat;
@@ -27,9 +28,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static com.home.pete.aquarium.Constants.MQTT_BROKER_URL;
+import com.home.pete.aquarium.Constants;
 
-public class AquariumReceiverService extends Service implements MqttCallback {
+public class AquariumReceiverService extends Service implements MqttCallback
+{
     private static final int KEEP_ALIVE_INTERVAL = 15;
     private static final int CONNECTION_TIMEOUT = 15;
     private static final int QOS = 2;
@@ -51,10 +53,12 @@ public class AquariumReceiverService extends Service implements MqttCallback {
     Thread serviceHeartBeatThread;
     private boolean m_continueHeartBeat = true;
 
+    private final IBinder m_binder = new MyLocalBinder();
+
     @Override
     public IBinder onBind(Intent intent) {
         Log.i(TAG, "onBind");
-        return null;
+        return m_binder;
     }
 
     @Override
@@ -65,11 +69,11 @@ public class AquariumReceiverService extends Service implements MqttCallback {
         startMyOwnForeground();
 
         m_topics = new ArrayList<String>();
-        m_topics.add("aquarium/temperature");
-        m_topics.add("aquarium/waterlevel");
-        m_topics.add("database/reply");
+        m_topics.add(Constants.TEMPERATURE_TOPIC);
+        m_topics.add(Constants.WATERLEVEL_TOPIC);
+        m_topics.add(Constants.CONTROLS_TOPIC);
+        m_topics.add(Constants.DATABASE_TOPIC);
         LocalBroadcastManager.getInstance(this).registerReceiver(databaseRequest, new IntentFilter("temperature"));
-
     }
 
     private void startMyOwnForeground(){
@@ -101,7 +105,7 @@ public class AquariumReceiverService extends Service implements MqttCallback {
             String initializedDate = new Date().toString();
             this.m_initialized = true;
             Log.i(TAG, "Initializing PushReceiver Service for first time: " + initializedDate);
-            m_server = MQTT_BROKER_URL;
+            m_server = Constants.MQTT_BROKER_URL;
             m_dataStore = new MemoryPersistence();
 
             serviceHeartBeatThread = new Thread()
@@ -151,6 +155,14 @@ public class AquariumReceiverService extends Service implements MqttCallback {
         return START_NOT_STICKY;
     }
 
+    public void publishMessage(String topic, int qos, byte[] payload) {
+        try {
+            publish(topic, qos, payload);
+        }
+        catch (MqttException e) {
+            Log.e(TAG, e.toString());
+        }
+    }
 
     /**
      * Performs a single publish
@@ -249,16 +261,21 @@ public class AquariumReceiverService extends Service implements MqttCallback {
 
     @Override
     public void messageArrived(String s, MqttMessage mqttMessage) {
-        if (s.equals("aquarium/temperature")) {
+        if (s.equals(Constants.TEMPERATURE_TOPIC)) {
             Double value = Double.valueOf(new String(mqttMessage.getPayload()));
             Intent msg = new Intent("temperature");
             msg.putExtra("ACTION", value);
             LocalBroadcastManager.getInstance(this).sendBroadcast(msg);
         }
-        if (s.equals("aquarium/waterlevel")) {
+        if (s.equals(Constants.WATERLEVEL_TOPIC)) {
             Integer value = Integer.valueOf(new String(mqttMessage.getPayload()));
             Intent msg = new Intent("waterlevel");
             msg.putExtra("ACTION", value);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(msg);
+        }
+        if (s.equals(Constants.CONTROLS_TOPIC)) {
+            Intent msg = new Intent("controlstate");
+            msg.putExtra("ACTION", new String(mqttMessage.getPayload()));
             LocalBroadcastManager.getInstance(this).sendBroadcast(msg);
         }
     }
@@ -294,4 +311,9 @@ public class AquariumReceiverService extends Service implements MqttCallback {
         }
     };
 
+    public class MyLocalBinder extends Binder {
+        AquariumReceiverService getService() {
+            return AquariumReceiverService.this;
+        }
+    }
 }

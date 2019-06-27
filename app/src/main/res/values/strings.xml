@@ -10,4 +10,8 @@
     <string name="IronAdditonLabel">Last Iron Added:</string>
     <string name="FilterChangeDateLabel">Last Filter Change:</string>
     <string name="WaterChangeDateLabel">Last Water Change:</string>
+    <string name="SwitchLabel">Switches</string>
+    <string name="PumpStateLabel">Pump State</string>
+    <string name="switchTextOn">ON</string>
+    <string name="SwitchTextOff">OFF</string>
 </resources>
