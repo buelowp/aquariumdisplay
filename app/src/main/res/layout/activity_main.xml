@@ -50,7 +50,7 @@
         android:background="@android:color/background_dark"
         android:onClick="viewSwitches"
         android:scaleType="centerInside"
-        android:src="@drawable/switch"
+        android:src="@drawable/onoff"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"

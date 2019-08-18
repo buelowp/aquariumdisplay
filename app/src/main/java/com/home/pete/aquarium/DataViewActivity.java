@@ -47,6 +47,11 @@ public class DataViewActivity extends Activity {
     TextView m_textViewWaterLevel;
     TextView m_textViewIronAddition;
     TextView m_textViewWaterChange;
+    TextView m_textViewFoamFilterChange;
+    TextView m_textViewBioFoamFilterChange;
+    TextView m_textViewClearMaxFilterChange;
+    TextView m_textViewPurigenFilterChange;
+    TextView m_textViewBloodWormsFed;
     TextView m_textViewFilterChange;
     Handler m_exitHandler = new Handler();
 
@@ -56,6 +61,11 @@ public class DataViewActivity extends Activity {
     public static final String WATER_CHANGE = "waterchange";
     public static final String FILTER_CHANGE = "filterchange";
     public static final String IRON_ADD = "ironaddition";
+    public static final String CLEARMAX_CHANGE = "clearmax";
+    public static final String BIOFOAM_CHANGE = "biofoam";
+    public static final String FOAM_CHANGE = "foamfilter";
+    public static final String PURIGEN_CHANGE = "purigen";
+    public static final String BLOOD_WORMS = "bloodworms";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,9 +76,14 @@ public class DataViewActivity extends Activity {
         m_preferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         m_textViewTemperature = findViewById(R.id.textViewTemperatureData);
         m_textViewWaterLevel = findViewById(R.id.textViewWaterLevelData);
-        m_textViewFilterChange = findViewById(R.id.textViewFilterChangeDateData);
         m_textViewIronAddition = findViewById(R.id.textViewIronAdditionDateData);
         m_textViewWaterChange = findViewById(R.id.textViewWaterChangeDateData);
+        m_textViewPurigenFilterChange = findViewById(R.id.textViewPurigenChangeDateData);
+        m_textViewBioFoamFilterChange = findViewById(R.id.textViewBioFoamFilterDateData);
+        m_textViewFoamFilterChange = findViewById(R.id.textViewFoamFilterDateData);
+        m_textViewClearMaxFilterChange = findViewById(R.id.textViewClearMaxChangeDateData);
+        m_textViewBloodWormsFed = findViewById(R.id.textViewWormFoodDateData);
+        m_textViewFilterChange = findViewById(R.id.textViewFilterChangeDateData);
 
         m_textViewWaterChange.setOnTouchListener(new View.OnTouchListener() {
             @SuppressLint("ClickableViewAccessibility")
@@ -127,12 +142,112 @@ public class DataViewActivity extends Activity {
             }
         });
 
+        m_textViewClearMaxFilterChange.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    long time = Calendar.getInstance().getTimeInMillis();
+                    SharedPreferences.Editor e = m_preferences.edit();
+                    e.putLong(CLEARMAX_CHANGE, time);
+                    e.commit();
+                    Log.i(TAG, "Stored " + time + " to shared preferences for last clearmax change");
+                    updateClearmaxFilterDate();
+                    m_exitHandler.removeCallbacks(exitViewOnTimeout);
+                    m_exitHandler.postDelayed(exitViewOnTimeout, VIEW_TIMEOUT);
+                }
+
+                return false;
+            }
+        });
+
+        m_textViewFoamFilterChange.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    long time = Calendar.getInstance().getTimeInMillis();
+                    SharedPreferences.Editor e = m_preferences.edit();
+                    e.putLong(FOAM_CHANGE, time);
+                    e.commit();
+                    Log.i(TAG, "Stored " + time + " to shared preferences for last foam filter change");
+                    updateFoamFilterDate();
+                    m_exitHandler.removeCallbacks(exitViewOnTimeout);
+                    m_exitHandler.postDelayed(exitViewOnTimeout, VIEW_TIMEOUT);
+                }
+
+                return false;
+            }
+        });
+
+        m_textViewPurigenFilterChange.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    long time = Calendar.getInstance().getTimeInMillis();
+                    SharedPreferences.Editor e = m_preferences.edit();
+                    e.putLong(PURIGEN_CHANGE, time);
+                    e.commit();
+                    Log.i(TAG, "Stored " + time + " to shared preferences for last clearmax filter change");
+                    updatePurigenFilterDate();
+                    m_exitHandler.removeCallbacks(exitViewOnTimeout);
+                    m_exitHandler.postDelayed(exitViewOnTimeout, VIEW_TIMEOUT);
+                }
+
+                return false;
+            }
+        });
+
+        m_textViewBioFoamFilterChange.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    long time = Calendar.getInstance().getTimeInMillis();
+                    SharedPreferences.Editor e = m_preferences.edit();
+                    e.putLong(BIOFOAM_CHANGE, time);
+                    e.commit();
+                    Log.i(TAG, "Stored " + time + " to shared preferences for last bio foam change");
+                    updateBioFoamFilterDate();
+                    m_exitHandler.removeCallbacks(exitViewOnTimeout);
+                    m_exitHandler.postDelayed(exitViewOnTimeout, VIEW_TIMEOUT);
+                }
+
+                return false;
+            }
+        });
+
+        m_textViewBloodWormsFed.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    long time = Calendar.getInstance().getTimeInMillis();
+                    SharedPreferences.Editor e = m_preferences.edit();
+                    e.putLong(BLOOD_WORMS, time);
+                    e.commit();
+                    Log.i(TAG, "Stored " + time + " to shared preferences for last blood worms fed");
+                    updateBloorWormsDate();
+                    m_exitHandler.removeCallbacks(exitViewOnTimeout);
+                    m_exitHandler.postDelayed(exitViewOnTimeout, VIEW_TIMEOUT);
+                }
+
+                return false;
+            }
+        });
+
         LocalBroadcastManager.getInstance(this).registerReceiver(temperatureUpdate, new IntentFilter("temperature"));
         LocalBroadcastManager.getInstance(this).registerReceiver(waterlevelUpdate, new IntentFilter("waterlevel"));
 
         updateFilterChangeDate();
         updateIronAdditionDate();
         updateWaterChangeDate();
+        updateBloorWormsDate();
+        updateBioFoamFilterDate();
+        updateClearmaxFilterDate();
+        updateFoamFilterDate();
+        updatePurigenFilterDate();
 
         m_exitHandler.postDelayed(exitViewOnTimeout, VIEW_TIMEOUT);
     }
@@ -162,13 +277,56 @@ public class DataViewActivity extends Activity {
         m_textViewWaterChange.setText(df.format(c.getTime()));
     }
 
+    private void updateBioFoamFilterDate()
+    {
+        Calendar c = Calendar.getInstance();
+        long item = m_preferences.getLong(BIOFOAM_CHANGE, 0);
+        c.setTimeInMillis(item);
+        SimpleDateFormat df = new SimpleDateFormat("EEE, MMM d");
+        m_textViewIronAddition.setText(df.format(c.getTime()));
+    }
+
+    private void updatePurigenFilterDate()
+    {
+        Calendar c = Calendar.getInstance();
+        long item = m_preferences.getLong(PURIGEN_CHANGE, 0);
+        c.setTimeInMillis(item);
+        SimpleDateFormat df = new SimpleDateFormat("EEE, MMM d");
+        m_textViewIronAddition.setText(df.format(c.getTime()));
+    }
+    private void updateClearmaxFilterDate()
+    {
+        Calendar c = Calendar.getInstance();
+        long item = m_preferences.getLong(CLEARMAX_CHANGE, 0);
+        c.setTimeInMillis(item);
+        SimpleDateFormat df = new SimpleDateFormat("EEE, MMM d");
+        m_textViewIronAddition.setText(df.format(c.getTime()));
+    }
+    private void updateBloorWormsDate()
+    {
+        Calendar c = Calendar.getInstance();
+        long item = m_preferences.getLong(BLOOD_WORMS, 0);
+        c.setTimeInMillis(item);
+        SimpleDateFormat df = new SimpleDateFormat("EEE, MMM d");
+        m_textViewIronAddition.setText(df.format(c.getTime()));
+    }
+    private void updateFoamFilterDate()
+    {
+        Calendar c = Calendar.getInstance();
+        long item = m_preferences.getLong(FOAM_CHANGE, 0);
+        c.setTimeInMillis(item);
+        SimpleDateFormat df = new SimpleDateFormat("EEE, MMM d");
+        m_textViewIronAddition.setText(df.format(c.getTime()));
+    }
+
     private void updateIronAdditionDate()
     {
         Calendar c = Calendar.getInstance();
         long item = m_preferences.getLong(IRON_ADD, 0);
+        Log.d(TAG, "Got " + item + " for last water change millis");
         c.setTimeInMillis(item);
         SimpleDateFormat df = new SimpleDateFormat("EEE, MMM d");
-        m_textViewIronAddition.setText(df.format(c.getTime()));
+        m_textViewWaterChange.setText(df.format(c.getTime()));
     }
 
     public void exitView(View view)

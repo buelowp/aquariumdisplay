@@ -1,8 +1,8 @@
 package com.home.pete.aquarium;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -40,23 +40,27 @@ import static com.home.pete.aquarium.Constants.VIEW_TIMEOUT;
  *
  * @see <a href="https://github.com/androidthings/contrib-drivers#readme">https://github.com/androidthings/contrib-drivers#readme</a>
  */
-public class SwitchViewActivity extends AppCompatActivity
+public class SwitchViewActivity extends Activity
 {
     private static final String TAG = SwitchViewActivity.class.getSimpleName();
     Handler m_exitHandler = new Handler();
     AquariumReceiverService serviceConnector;
     public boolean m_isBound = false;
     Switch m_pumpState;
+    Intent m_arsIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_switch_view);
-        m_pumpState = findViewById(R.id.switchPumpState);
+        m_pumpState = findViewById(R.id.switchFilterState);
 
         Log.d(TAG, "onCreate");
         m_exitHandler.postDelayed(exitViewOnTimeout, VIEW_TIMEOUT);
         LocalBroadcastManager.getInstance(this).registerReceiver(controlsUpdate, new IntentFilter("controls"));
+        m_arsIntent = new Intent(this, AquariumReceiverService.class);
+        bindService(m_arsIntent, sc, BIND_AUTO_CREATE);
+
     }
 
     private Runnable exitViewOnTimeout = new Runnable() {
@@ -74,17 +78,18 @@ public class SwitchViewActivity extends AppCompatActivity
         finish();
     }
 
-    private ServiceConnection sc = new ServiceConnection() {
-
+    public ServiceConnection sc = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             AquariumReceiverService.MyLocalBinder binder = (AquariumReceiverService.MyLocalBinder) service;
             serviceConnector = binder.getService();
             m_isBound = true;
+            Log.d(TAG, "onServiceConnected");
         }
 
         public void onServiceDisconnected(ComponentName arg0) {
             serviceConnector = null;
             m_isBound = false;
+            Log.d(TAG, "onServiceDisconnected");
         }
     };
 
@@ -135,5 +140,12 @@ public class SwitchViewActivity extends AppCompatActivity
 
         }
     };
+
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "onDestroy");
+        super.onDestroy();
+    }
+
 
 }

@@ -89,10 +89,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:text="@string/WaterChangeDateLabel"
-        android:textSize="17sp"
         android:gravity="right"
+        android:text="@string/WaterChangeDateLabel"
         android:textColor="@android:color/white"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewWaterLevelLabel" />
 
@@ -130,12 +130,12 @@
         android:textColor="@android:color/white"
         android:textSize="18sp"
         android:gravity="right"
-        android:text="@string/FilterChangeDateLabel"
+        android:text="@string/PurigenFilterChangeLabel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewIronAdditionDate" />
 
     <TextView
-        android:id="@+id/textViewFilterChangeDateData"
+        android:id="@+id/textViewPurigenChangeDateData"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -145,5 +145,118 @@
         android:gravity="left"
         app:layout_constraintStart_toEndOf="@+id/textViewFilterChangeDate"
         app:layout_constraintTop_toBottomOf="@+id/textViewIronAdditionDateData" />
+
+    <TextView
+        android:id="@+id/textViewClearMaxChangeDate"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:gravity="right"
+        android:text="@string/ClearMaxChangeLabel"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewFilterChangeDate" />
+
+    <TextView
+        android:id="@+id/textViewClearMaxChangeDateData"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        tools:layout_editor_absoluteX="184dp"
+        tools:layout_editor_absoluteY="176dp" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:gravity="right"
+        android:text="@string/FoamFilterLabel"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewClearMaxChangeDate" />
+
+    <TextView
+        android:id="@+id/textViewFoamFilterDateData"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@+id/textView3"
+        app:layout_constraintTop_toBottomOf="@+id/textViewClearMaxChangeDateData" />
+
+    <TextView
+        android:id="@+id/textViewBioFoamFilterDate"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:gravity="right"
+        android:text="@string/BioFoamFilterLabel"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+    <TextView
+        android:id="@+id/textViewBioFoamFilterDateData"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@+id/textViewBioFoamFilterDate"
+        app:layout_constraintTop_toBottomOf="@+id/textViewFoamFilterDateData" />
+
+    <TextView
+        android:id="@+id/textViewWormFoodDate"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:gravity="right"
+        android:text="@string/WormFoodLabel"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewBioFoamFilterDate" />
+
+    <TextView
+        android:id="@+id/textViewWormFoodDateData"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@+id/textViewWormFoodDate"
+        app:layout_constraintTop_toBottomOf="@+id/textViewBioFoamFilterDateData" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:gravity="right"
+        android:text="@string/FilterChangeLabel"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewWormFoodDate" />
+
+    <TextView
+        android:id="@+id/textViewFilterChangeDateData"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/textViewWormFoodDateData" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

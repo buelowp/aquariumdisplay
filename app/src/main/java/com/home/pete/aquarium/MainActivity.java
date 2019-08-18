@@ -156,6 +156,8 @@ public class MainActivity extends Activity {
         m_dataView.setVisibility(state);
         m_fishTextView.setVisibility(state);
         m_dataTextView.setVisibility(state);
+        m_switchTextView.setVisibility(state);
+        m_switchView.setVisibility(state);
     }
 
     private BroadcastReceiver databaseReply = new BroadcastReceiver() {

@@ -8,7 +8,9 @@
     <application android:label="@string/app_name">
         <uses-library android:name="com.google.android.things" />
 
-        <activity android:name=".SwitchViewActivity">
+        <activity
+            android:name=".SwitchViewActivity"
+            android:theme="@android:style/Theme.NoTitleBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

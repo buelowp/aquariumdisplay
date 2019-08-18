@@ -8,10 +8,15 @@
     <string name="AquariumTempLabel">Temperature:</string>
     <string name="AquariumWaterLevelLabel">Water Level:</string>
     <string name="IronAdditonLabel">Last Iron Added:</string>
-    <string name="FilterChangeDateLabel">Last Filter Change:</string>
-    <string name="WaterChangeDateLabel">Last Water Change:</string>
+    <string name="PurigenFilterChangeLabel">Purigen Change:</string>
+    <string name="WaterChangeDateLabel">Water Change:</string>
     <string name="SwitchLabel">Switches</string>
     <string name="PumpStateLabel">Pump State</string>
     <string name="switchTextOn">ON</string>
     <string name="SwitchTextOff">OFF</string>
+    <string name="ClearMaxChangeLabel">Clearmax:</string>
+    <string name="FoamFilterLabel">Foam Filter:</string>
+    <string name="BioFoamFilterLabel">Bio Foam:</string>
+    <string name="WormFoodLabel">Blood Worms:</string>
+    <string name="FilterChangeLabel">Filter Change:</string>
 </resources>
